@@ -9,6 +9,14 @@ app = sys.argv[1].split('/')[2]
 problem = sys.argv[1].split('/')[3]
 func = sys.argv[1].split('/')[4]
 
+nonfp = False
+fp = False
+if 'fp' in func:
+    fp = True
+if 'nonfp' in func:
+    fp = False
+    nonfp = True
+
 arch = sys.argv[2]
 
 subdirs = [x[0] for x in os.walk(base) if x[0] != base]
@@ -59,7 +67,13 @@ for p in pattern_set:
 
 plt.xlabel('Ranks')
 plt.ylabel('Total Bandwidth (MB/s)')
-plt.title(app + ', ' + problem + ': Gather/Scatter Total Bandwidths (' + arch + ')')
+
+if fp:
+    plt.title(app + ', ' + problem + ': FP Gather/Scatter Total Bandwidths (' + arch + ')')
+elif nonfp:
+    plt.title(app + ', ' + problem + ': Non-FP Gather/Scatter Total Bandwidths (' + arch + ')')
+else:
+    plt.title(app + ', ' + problem + ': Gather/Scatter Total Bandwidths (' + arch + ')')
 
 plt.legend()
 
@@ -85,7 +99,12 @@ for p in pattern_set:
 
 plt.xlabel('Ranks')
 plt.ylabel('Average Bandwidth per Rank (MB/s)')
-plt.title(app + ', ' + problem + ': Gather/Scatter Average Bandwidth per Rank (' + arch + ')')
+if fp:
+    plt.title(app + ', ' + problem + ': FP Gather/Scatter Average Bandwidth per Rank (' + arch + ')')
+elif nonfp:
+    plt.title(app + ', ' + problem + ': Non-FP Gather/Scatter Average Bandwidth per Rank (' + arch + ')')
+else:
+    plt.title(app + ', ' + problem + ': Gather/Scatter Average Bandwidth per Rank (' + arch + ')')
 
 plt.legend()
 

@@ -6,13 +6,10 @@ Spatter Weak Scaling Experiments
 ## Description
 This repository contains a few scripts and gather/scatter patterns of LANL codes in the form of Spatter JSON input files:
 
-1. Build Spatter with MPI support for weak scaling experiments. See the lanl-scaling branch of (https://github.com/JDTruj2018/spatter/tree/lanl-scaling/configure) until the changes are merged in
+1. Build Spatter with MPI support for weak scaling experiments.
 2. Performing on-node weak scaling experiments with Spatter given patterns from LANL codes
 	a. MPI
 	b. OpenMP (In Progress)
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
 
 ## Usage
 ### Create a Module Environment
@@ -45,7 +42,8 @@ The `scripts/scaling.sh` script has the following options:
 	p: Problem name
 	f: Pattern name
 	n: Architecture/Partition
-	g: Plotting/Post-processing (optional, default: on)
+	c: Core binding (optional, default: off)
+        g: Plotting/Post-processing (optional, default: on)
 	r: Toggle MPI scaling (optional, default: off)
 	t: Toggle OpenMP scaling (optional, default: off)
 	h: Print usage message
