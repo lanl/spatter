@@ -45,7 +45,8 @@ The `scripts/scaling.sh` script has the following options:
 	p: Problem name
 	f: Pattern name
 	n: Architecture/Partition
-	g: Plotting/Post-processing (optional, default: on)
+	c: Core binding (optional, default: off)
+        g: Plotting/Post-processing (optional, default: on)
 	r: Toggle MPI scaling (optional, default: off)
 	t: Toggle OpenMP scaling (optional, default: off)
 	h: Print usage message
