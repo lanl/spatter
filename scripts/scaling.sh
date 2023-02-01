@@ -1,11 +1,12 @@
 #!/bin/bash
 
 usage() {
-	echo "Usage ./scaling.sh -a <application> -p <input problem> -f <pattern> -n <arch> -g <0/1 enable/disable plotting> [-r 'toggle scaling with MPI'] [-t 'toggle scaling with OpenMP']
+	echo "Usage ./scaling.sh -a <application> -p <input problem> -f <pattern> -n <arch> [-c 'toggle core binding'] [-g <0/1 enable/disable plotting>] [-r 'toggle scaling with MPI'] [-t 'toggle scaling with OpenMP']
 		-a : Specify the name of the application (see available apps in the patterns sub-directory)
 		-p : Specify the name of the input problem (see available problems in the application sub-directory)
 		-f : Specify the base name of the input JSON file containing the gather/scatter pattern (see available patterns in the input problem subdirectory)
 		-n : Specify the architecture/partition being ran on (used to appropriately save data)
+		-c : Optional, toggle core binding (default: off)
 		-g : Optional, toggle plotting/post-processing. Requires python3 environment with pandas, matplotlib (default: on)
 		-r : Optional, enable scaling with MPI (default: off)
 		-t : Optional, enable scaling with OpenMP (default: off)"	
@@ -17,7 +18,8 @@ else
 	MPI=0
 	OPENMP=0
 	PLOT=1
-	while getopts "a:f:p:n:grt" opt; do
+	BINDING=0
+	while getopts "a:f:p:n:cgrt" opt; do
 		case $opt in 
 			a) APP=$OPTARG
 			;;
@@ -26,6 +28,8 @@ else
 			p) PROBLEM=$OPTARG
 			;;
 			n) ARCH=$OPTARG
+			;;
+			c) BINDING=1
 			;;
 			g) PLOT=$OPTARG
 			;;
@@ -50,6 +54,7 @@ else
 	echo "MPI SCALING: ${MPI}"
 	if [[ "${MPI}" -eq "1" ]]; then
 		echo "RANK LIST: ${ranklist[*]}"
+		echo "BINDING: ${BINDING}"
 	fi
 
 	echo "OPENMP SCALING: ${OPENMP}"
@@ -83,7 +88,11 @@ else
 	if [[ "${MPI}" -eq "1" ]]; then
 		export OMP_NUM_THREADS=1
 		for rank in ${ranklist[@]}; do
-			srun -n ${rank} ${SPATTER} -pFILE=${JSON} -q3 > mpi_${rank}r_1t.txt
+			if [[ "${BINDING}" -eq "1" ]]; then
+				srun -n ${rank} --cpu-bind=core ${SPATTER} -pFILE=${JSON} -q3 > mpi_${rank}r_1t.txt
+			else
+				srun -n ${rank} ${SPATTER} -pFILE=${JSON} -q3 > mpi_${rank}r_1t.txt
+			fi
 
 			mkdir -p ${rank}r
 
