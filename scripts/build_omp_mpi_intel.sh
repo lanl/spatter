@@ -5,9 +5,8 @@ source ./scripts/config.sh
 cd ${HOMEDIR}
 source ${MODULEFILE}
 
-git clone git@github.com:JDTruj2018/spatter.git
+git@github.com:hpcgarage/spatter.git
 cd spatter
-git checkout lanl-scaling
 
 ./configure/configure_omp_mpi_intel
 
