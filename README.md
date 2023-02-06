@@ -12,12 +12,36 @@ This repository contains a few scripts and gather/scatter patterns of LANL codes
 	b. OpenMP (In Progress)
 
 ## Usage
+### Clone
+```
+git clone git@github.com:lanl/spatter.git
+```
+
+### LFS Pull and untar JSON files containing patterns
+```
+git lfs pull
+tar -xvzf patterns/flag/static_2d/001.json.tar.gz
+tar -xvzf patterns/flag/static_2d/001nonfp.json.tar.gz
+tar -xvzf patterns/flag/static_2d/001fp.json.tar.gz
+tar -xvzf patterns/xrage/asteroid/spatter.json.tar.gz
+mv spatter.json patters/xrage/asteroid/spatter.json
+```
+
 ### Create a Module Environment
 Copy the current Darwin Module Environment File
-`cp modules/darwin.mod modules/<name>.mod`
+
+For a base CPU Module file:
+`cp modules/darwin_skylake.mod modules/<name>.mod`
+
+For a base GPU Module file:
+`cp modules/darwin_a100.mod modules/<name>.mod`
 
 Edit the modules required on your system
-You need CMake, an Intel Compiler, and MPI at a minimum
+
+For CPU builds, you need CMake, an Intel Compiler, and MPI at a minimum
+For GPU builds (CUDA), you need CMake, nvcc, gcc, and MPI
+
+For plotting (see `scripts/plot_mpi.py`), you will need a Python 3 installation with matplotlib and pandas
 
 ### Editing the Configuration
 Edit the configuration bash script
@@ -28,10 +52,16 @@ Change the MODULEFILE to your new module file.
 Change threadlist and ranklist as appropriate for your system. This sets the number of OpenMP threads or MPI ranks Spatter will scale through
 You may leave SPATTER unchanged unless you have another Spatter binary on your system. If so, you may update this variable to point to you Spatter binary. Otherwise, we will build Spatter in the next step.
 
-### Building Spatter
+### Building Spatter on CPUs
 ```
 cd spatter
-bash scripts/builds.sh
+bash scripts/build_omp_mpi_intel.sh
+```
+
+### Building Spatter on NVIDIA GPUs
+```
+cd spatter
+bash scripts/builds_cuda.sh
 ```
 
 ### Running a Scaling Experiment
@@ -59,14 +89,14 @@ If OpenMP threading is turned on, full bandwidth results will be stored in the o
 
 ```
 cd spatter
-bash scripts/scaling.sh -a flag -p static_2d -f 001 -n spr -r
+bash scripts/scaling.sh -a flag -p static_2d -f 001 -n A100 -r
 ```
 
 ### Running Spatter Serially
 Simply update the `threadlist` and `ranklist` variables in `scripts/config.sh` to the value of `( 1 )`
 
 ```
-bash scripts/scaling.sh -a flag -p static_2d -f 001 -n spr -r
+bash scripts/scaling.sh -a flag -p static_2d -f 001 -n A100 -r
 ```
 
 ## Support
