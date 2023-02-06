@@ -23,10 +23,10 @@ export HOMEDIR=`pwd`
 ```
 git lfs pull
 tar -xvzf patterns/flag/static_2d/001.json.tar.gz
-tar -xvzf patterns/flag/static_2d/001nonfp.json.tar.gz
-tar -xvzf patterns/flag/static_2d/001fp.json.tar.gz
+tar -xvzf patterns/flag/static_2d/001.nonfp.json.tar.gz
+tar -xvzf patterns/flag/static_2d/001.fp.json.tar.gz
 tar -xvzf patterns/xrage/asteroid/spatter.json.tar.gz
-mv spatter.json patters/xrage/asteroid/spatter.json
+mv spatter.json patterns/xrage/asteroid/spatter.json
 ```
 
 ### Create a Module Environment
