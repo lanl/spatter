@@ -15,6 +15,8 @@ This repository contains a few scripts and gather/scatter patterns of LANL codes
 ### Clone
 ```
 git clone git@github.com:lanl/spatter.git
+cd spatter
+export HOMEDIR=`pwd`
 ```
 
 ### LFS Pull and untar JSON files containing patterns
@@ -54,13 +56,13 @@ You may leave SPATTER unchanged unless you have another Spatter binary on your s
 
 ### Building Spatter on CPUs
 ```
-cd spatter
+cd ${HOMEDIR}
 bash scripts/build_omp_mpi_intel.sh
 ```
 
 ### Building Spatter on NVIDIA GPUs
 ```
-cd spatter
+cd ${HOMEDIR}
 bash scripts/builds_cuda.sh
 ```
 
