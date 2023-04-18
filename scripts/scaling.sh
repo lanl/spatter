@@ -117,7 +117,10 @@ else
 
 			echo ${CMD}
 			${CMD} > mpi_${ranklist[i]}r_1t.txt
-			mv ${JSON}.orig ${JSON}
+
+                        if [[ "${WEAKSCALING}" -ne "1" ]]; then
+				mv ${JSON}.orig ${JSON}
+                        fi
 
 			mkdir -p ${ranklist[i]}r
 
