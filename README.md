@@ -49,9 +49,9 @@ For plotting (see `scripts/plot_mpi.py`), you will need a Python 3 installation 
 Edit the configuration bash script
 `vim scripts/config.sh`
 
-Change the HOMEDIR to the path to the root of this repository.
-Change the MODULEFILE to your new module file.
-Change threadlist and ranklist as appropriate for your system. This sets the number of OpenMP threads or MPI ranks Spatter will scale through
+Change the HOMEDIR to the path to the root of this repository (absolute path).
+Change the MODULEFILE to your new module file (absolute path).
+Change threadlist and ranklist and sizelist as appropriate for your system. This sets the number of OpenMP threads or MPI ranks Spatter will scale through
 You may leave SPATTER unchanged unless you have another Spatter binary on your system. If so, you may update this variable to point to you Spatter binary. Otherwise, we will build Spatter in the next step.
 
 ### Building Spatter on CPUs
@@ -78,12 +78,13 @@ The `scripts/scaling.sh` script has the following options:
         g: Plotting/Post-processing (optional, default: on)
 	r: Toggle MPI scaling (optional, default: off)
 	t: Toggle OpenMP scaling (optional, default: off)
+	w: Toggle Weak/Strong Scaling (optional, default: off = strong scaling)
 	h: Print usage message
 
 The Application name, Problem name, and Pattern name each correspond to subdirectories in this repository containing patterns stored as Spatter JSON input files.
 The JSON file of interest should be located at <Arch>/<Application>/<Problem>/<Pattern>.json
 
-The results of the weak scaling experiment will be stored in the spatter.scaling directory, within the <Arch>/<Application>/<Problem>/<Pattern> subdirectory.
+The results of the weak scaling experiment will be stored in the spatter.weakscaling or spatter.strongscaling directory, within the <Arch>/<Application>/<Problem>/<Pattern> subdirectory.
 
 If MPI scaling is enabled, full bandwidth results will be stored in the mpi_<ranks>r)1t.txt files. Additionally, the <rank>r subdirectories hold sorted bandwidth data for each rank from each pattern that was found in the Spatter JSON input file. These files will be labeled <ranks>r/<ranks>r_1t_<pattern_num>p.txt.
 
