@@ -89,6 +89,8 @@ Strong-Scaling experiment with plotting enabled. Results will be found in `spatt
 bash scripts/scaling.sh -a flag -p static_2d -f 001 -n A100 -r 
 ```
 
+The `scripts/mpirunscaling.sh` script has been provided if you need to use `mpirun` to launch jobs rather than `srun`.
+
 ### Running Spatter Serially
 Simply update the `ranklist` variables in `scripts/config.sh` to the value of `( 1 )`
 
