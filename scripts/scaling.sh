@@ -1,7 +1,7 @@
 #!/bin/bash
 
 usage() {
-	echo "Usage ./scaling.sh -a <application> -p <input problem> -f <pattern> -n <arch> [-c 'toggle core binding'] [-g <0/1 enable/disable plotting>] [-r 'toggle scaling with MPI'] [-t 'toggle scaling with OpenMP'] [-w 'toggle weak scaling']
+	echo "Usage ./scaling.sh -a <application> -p <input problem> -f <pattern> -n <arch> [-c 'toggle core binding'] [-g <0/1 enable/disable plotting>] [-r 'toggle scaling with MPI'] [-w 'toggle weak scaling']
 		-a : Specify the name of the application (see available apps in the patterns sub-directory)
 		-p : Specify the name of the input problem (see available problems in the application sub-directory)
 		-f : Specify the base name of the input JSON file containing the gather/scatter pattern (see available patterns in the input problem subdirectory)
@@ -9,7 +9,6 @@ usage() {
 		-c : Optional, toggle core binding (default: off)
 		-g : Optional, toggle plotting/post-processing. Requires python3 environment with pandas, matplotlib (default: on)
 		-r : Optional, enable scaling with MPI (default: off)
-		-t : Optional, enable scaling with OpenMP (default: off)
 		-w : Optional, enable weak scaling (default: off, strong scaling)"	
 }
 
@@ -19,10 +18,9 @@ else
         SCALINGDIR="spatter.scaling"
         WEAKSCALING=0
 	MPI=0
-	OPENMP=0
 	PLOT=1
 	BINDING=0
-	while getopts "a:f:p:n:cgrtw" opt; do
+	while getopts "a:f:p:n:cgrw" opt; do
 		case $opt in 
 			a) APP=$OPTARG
 			;;
@@ -37,8 +35,6 @@ else
 			g) PLOT=$OPTARG
 			;;
 			r) MPI=1
-			;;
-			t) OPENMP=1
 			;;
 			w) WEAKSCALING=1
 			;;
@@ -70,12 +66,6 @@ else
 		echo "BINDING: ${BINDING}"
 	fi
 
-	echo "OPENMP SCALING: ${OPENMP}"
-	if [[ "${OPENMP}" -eq "1" ]]; then
-		echo "THREAD LIST: ${threadlist[*]}"
-	fi
-	echo ""
-
 	cd ${HOMEDIR}
 	source ${MODULEFILE}
 
@@ -90,14 +80,6 @@ else
 	mkdir -p ${SCALINGDIR}/${RUNNAME}/${APP}/${PROBLEM}/${PATTERN}
 			
 	cd ${SCALINGDIR}/${RUNNAME}/${APP}/${PROBLEM}/${PATTERN}
-
-	if [[ "${OPENMP}" -eq "1" ]]; then
-		for thread in ${threadlist[@]}; do
-			export OMP_NUM_THREADS=${thread}
-
-			${SPATTER} -pFILE=${JSON} -q3 > openmp_1r_${thread}t.txt
-		done
-	fi
 
 	if [[ "${MPI}" -eq "1" ]]; then
 		export OMP_NUM_THREADS=1
