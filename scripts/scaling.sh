@@ -100,7 +100,7 @@ else
 			num_patterns="$((num_patterns-1))"
 
 			for pattern in $(seq 0 ${num_patterns}); do
-				cat mpi_${rank}r_1t.txt | grep "^${pattern} " | cut -d$' ' -f 12-18 > ${rank}r/${rank}r_1t_${pattern}p.txt.tmp
+				cat mpi_${rank}r_1t.txt | grep "^${pattern} " | awk '{print $3}' > ${rank}r/${rank}r_1t_${pattern}p.txt.tmp
 				cat ${rank}r/${rank}r_1t_${pattern}p.txt.tmp | awk '{$1=$1};1' > ${rank}r/${rank}r_1t_${pattern}p.txt
 				rm ${rank}r/${rank}r_1t_${pattern}p.txt.tmp
 			done
