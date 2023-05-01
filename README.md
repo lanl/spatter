@@ -57,6 +57,7 @@ The `scripts/scaling.sh` script has the following options:
 	p: Problem name
 	f: Pattern name
 	n: User-defined run name (for saving results)
+	b: Boundary limit (option, default: off for weak scaling, on for strong scaling)
 	c: Core binding (optional, default: off)
         g: Plotting/Post-processing (optional, default: on)
 	r: Toggle MPI scaling (optional, default: off)
@@ -78,14 +79,14 @@ If MPI scaling is enabled, full bandwidth results will be stored in the `mpi_<ra
 
 #### Examples
 
-Weak-Scaling experiment with core-binding turned on and plotting enabled. Results will be found in `spatter.weakscaling/CTS1/flag/static_2d/001` and Figures will be found in 'figures/CTS1/flag/static_2d/001`.
+Weak-Scaling experiment with core-binding turned on and plotting enabled. Boundary limiting will be disabled by default. Results will be found in `spatter.weakscaling/CTS1/flag/static_2d/001` and Figures will be found in 'figures/CTS1/flag/static_2d/001`.
 
 ```
 bash scripts/scaling.sh -a flag -p static_2d -f 001 -n CTS1 -c -r -w
 
 ```
 
-Strong-Scaling experiment with plotting enabled. Results will be found in `spatter.strongscaling/A100/flag/static_2d/001` and Figures will be found in `figures/CTS1/flag/static_2d/001`.
+Strong-Scaling experiment with plotting enabled. Boundary limiting using the values in boundarylist will be enabled by default. Results will be found in `spatter.strongscaling/A100/flag/static_2d/001` and Figures will be found in `figures/CTS1/flag/static_2d/001`.
 ```
 bash scripts/scaling.sh -a flag -p static_2d -f 001 -n A100 -r 
 ```
