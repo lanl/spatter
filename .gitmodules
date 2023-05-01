@@ -1,0 +1,4 @@
+[submodule "spatter"]
+	path = spatter
+	url = git@github.com:JDTruj2018/spatter.git
+	branch = strong-scaling

@@ -102,13 +102,13 @@ else
 		export OMP_NUM_THREADS=1
 		for i in ${!ranklist[*]}; do
 			if [[ "${BINDING}" -eq "1" ]]; then	
-				CMD="srun -n ${ranklist[i]} --cpu-bind=core ${SPATTER} -pFILE=${JSON} -q3"
+				CMD="mpirun -n ${ranklist[i]} --bind-to core ${SPATTER} -pFILE=${JSON} -q3"
 				if [[ "${WEAKSCALING}" -ne "1" ]]; then
 					cp ${JSON} ${JSON}.orig
 					sed -Ei 's/\}/\, "pattern-size": '${sizelist[i]}'\}/g' ${JSON}
 				fi
 			else
-				CMD="srun -n ${ranklist[i]} ${SPATTER} -pFILE=${JSON} -q3"
+				CMD="mpirun -n ${ranklist[i]} ${SPATTER} -pFILE=${JSON} -q3"
 				if [[ "${WEAKSCALING}" -ne "1" ]]; then
 					cp ${JSON} ${JSON}.orig
 					sed -Ei 's/\}/\"pattern-size": '${sizelist[i]}'\}/g' ${JSON}
@@ -118,9 +118,9 @@ else
 			echo ${CMD}
 			${CMD} > mpi_${ranklist[i]}r_1t.txt
 
-                        if [[ "${WEAKSCALING}" -ne "1" ]]; then
+			if [[ "${WEAKSCALING}" -ne "1" ]]; then
 				mv ${JSON}.orig ${JSON}
-                        fi
+			fi
 
 			mkdir -p ${ranklist[i]}r
 
@@ -128,9 +128,9 @@ else
 			num_patterns="$((num_patterns-1))"
 
 			for pattern in $(seq 0 ${num_patterns}); do
-				cat mpi_${rank}r_1t.txt | grep "^${pattern} " | awk '{print $3}' > ${rank}r/${rank}r_1t_${pattern}p.txt.tmp
-				cat ${rank}r/${rank}r_1t_${pattern}p.txt.tmp | awk '{$1=$1};1' > ${rank}r/${rank}r_1t_${pattern}p.txt
-				rm ${rank}r/${rank}r_1t_${pattern}p.txt.tmp
+				cat mpi_${ranklist[i]}r_1t.txt | grep "^${pattern} " | cut -d$' ' -f 12-18 > ${ranklist[i]}r/${ranklist[i]}r_1t_${pattern}p.txt.tmp
+				cat ${ranklist[i]}r/${ranklist[i]}r_1t_${pattern}p.txt.tmp | awk '{$1=$1};1' > ${ranklist[i]}r/${ranklist[i]}r_1t_${pattern}p.txt
+				rm ${ranklist[i]}r/${ranklist[i]}r_1t_${pattern}p.txt.tmp
 			done
 		done
 	
