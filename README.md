@@ -19,7 +19,7 @@ This repository contains a few scripts and gather/scatter patterns of LANL codes
 
 ### Clone
 ```
-git submodule update --init --recursive git@github.com:lanl/spatter.git
+git clone --recursive git@github.com:lanl/spatter.git
 cd spatter
 ```
 
