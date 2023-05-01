@@ -53,16 +53,16 @@ This setup script performs the following:
 This will perform a weak scaling experiment 
 
 The `scripts/scaling.sh` script has the following options:
-	- a: Application name
-	- p: Problem name
-	- f: Pattern name
-	- n: User-defined run name (for saving results)
-	- b: Boundary limit (option, default: off for weak scaling, on for strong scaling)
-	- c: Core binding (optional, default: off)
-        - g: Plotting/Post-processing (optional, default: on)
-	- r: Toggle MPI scaling (optional, default: off)
-	- w: Toggle Weak/Strong Scaling (optional, default: off = strong scaling)
-	- h: Print usage message
+- a: Application name
+- p: Problem name
+- f: Pattern name
+- n: User-defined run name (for saving results)
+- b: Boundary limit (option, default: off for weak scaling, on for strong scaling)
+- c: Core binding (optional, default: off)
+- g: Plotting/Post-processing (optional, default: on)
+- r: Toggle MPI scaling (optional, default: off)
+- w: Toggle Weak/Strong Scaling (optional, default: off = strong scaling)
+- h: Print usage message
 
 The Application name, Problem name, and Pattern name each correspond to subdirectories in this repository containing patterns stored as Spatter JSON input files.
 The JSON file of interest should be located at <Arch>/<Application>/<Problem>/<Pattern>.json
