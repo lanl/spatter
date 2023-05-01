@@ -5,7 +5,7 @@ usage() {
 		-a : Specify the name of the application (see available apps in the patterns sub-directory)
 		-p : Specify the name of the input problem (see available problems in the application sub-directory)
 		-f : Specify the base name of the input JSON file containing the gather/scatter pattern (see available patterns in the input problem subdirectory)
-		-n : Specify the architecture/partition being ran on (used to appropriately save data)
+		-n : Specify the test name you would like to use to identify this run (used to appropriately save data)
 		-c : Optional, toggle core binding (default: off)
 		-g : Optional, toggle plotting/post-processing. Requires python3 environment with pandas, matplotlib (default: on)
 		-r : Optional, enable scaling with MPI (default: off)
@@ -30,7 +30,7 @@ else
 			;;
 			p) PROBLEM=$OPTARG
 			;;
-			n) ARCH=$OPTARG
+			n) TESTNAME=$OPTARG
 			;;
 			c) BINDING=1
 			;;
@@ -53,7 +53,7 @@ else
 	echo "APP: ${APP}"
 	echo "PROBLEM: ${PROBLEM}"
 	echo "PATTERN: ${PATTERN}"
-	echo "ARCH: ${ARCH}"
+	echo "TESTNAME: ${TESTNAME}"
 	echo "PLOTTING: ${PLOT}"
 
 	echo "MPI SCALING: ${MPI}"
@@ -74,21 +74,22 @@ else
 	if [[ "${OPENMP}" -eq "1" ]]; then
 		echo "THREAD LIST: ${threadlist[*]}"
 	fi
+	echo ""
 
 	cd ${HOMEDIR}
 	source ${MODULEFILE}
 
 	# Ensure that we got all the arguments
-	if [[ -z "${APP}" || -z "${PROBLEM}" || -z "${PATTERN}" || -z "${ARCH}" ]] ; then
+	if [[ -z "${APP}" || -z "${PROBLEM}" || -z "${PATTERN}" || -z "${TESTNAME}" ]] ; then
 		usage
 		exit 1
 	fi
 
 	JSON=${HOMEDIR}/patterns/${APP}/${PROBLEM}/${PATTERN}.json
 
-	mkdir -p ${SCALINGDIR}/${ARCH}/${APP}/${PROBLEM}/${PATTERN}
+	mkdir -p ${SCALINGDIR}/${TESTNAME}/${APP}/${PROBLEM}/${PATTERN}
 			
-	cd ${SCALINGDIR}/${ARCH}/${APP}/${PROBLEM}/${PATTERN}
+	cd ${SCALINGDIR}/${TESTNAME}/${APP}/${PROBLEM}/${PATTERN}
 
 	if [[ "${OPENMP}" -eq "1" ]]; then
 		for thread in ${threadlist[@]}; do
@@ -128,16 +129,22 @@ else
 			num_patterns="$((num_patterns-1))"
 
 			for pattern in $(seq 0 ${num_patterns}); do
-				cat mpi_${rank}r_1t.txt | grep "^${pattern} " | awk '{print $3}' > ${rank}r/${rank}r_1t_${pattern}p.txt.tmp
-				cat ${rank}r/${rank}r_1t_${pattern}p.txt.tmp | awk '{$1=$1};1' > ${rank}r/${rank}r_1t_${pattern}p.txt
-				rm ${rank}r/${rank}r_1t_${pattern}p.txt.tmp
+				cat mpi_${ranklist[i]}r_1t.txt | grep "^${pattern} " | awk '{print $3}' > ${ranklist[i]}r/${ranklist[i]}r_1t_${pattern}p.txt.tmp
+				cat ${ranklist[i]}r/${ranklist[i]}r_1t_${pattern}p.txt.tmp | awk '{$1=$1};1' > ${ranklist[i]}r/${ranklist[i]}r_1t_${pattern}p.txt
+				rm ${ranklist[i]}r/${ranklist[i]}r_1t_${pattern}p.txt.tmp
 			done
 		done
+
+		echo ""
 	
 		if [[ "${PLOT}" -eq "1" ]]; then
 			cd ${HOMEDIR}
-			mkdir -p figures/${ARCH}/${APP}/${PROBLEM}/${PATTERN}
-			python3 scripts/plot_mpi.py ${SCALINGDIR}/${ARCH}/${APP}/${PROBLEM}/${PATTERN} ${ARCH}
+			mkdir -p figures/${TESTNAME}/${APP}/${PROBLEM}/${PATTERN}
+			echo "Plotting Results..."
+			python3 scripts/plot_mpi.py ${SCALINGDIR}/${TESTNAME}/${APP}/${PROBLEM}/${PATTERN} ${TESTNAME}
+			echo ""
 		fi
 	fi
+
+	echo "See ${SCALINGDIR}/${TESTNAME}/${APP}/${PROBLEM}/${PATTERN} for results"
 fi
