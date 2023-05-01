@@ -30,7 +30,7 @@ else
 			;;
 			p) PROBLEM=$OPTARG
 			;;
-			n) TESTNAME=$OPTARG
+			n) RUNNAME=$OPTARG
 			;;
 			c) BINDING=1
 			;;
@@ -53,7 +53,7 @@ else
 	echo "APP: ${APP}"
 	echo "PROBLEM: ${PROBLEM}"
 	echo "PATTERN: ${PATTERN}"
-	echo "TESTNAME: ${TESTNAME}"
+	echo "RUNNAME: ${RUNNAME}"
 	echo "PLOTTING: ${PLOT}"
 
 	echo "MPI SCALING: ${MPI}"
@@ -80,16 +80,16 @@ else
 	source ${MODULEFILE}
 
 	# Ensure that we got all the arguments
-	if [[ -z "${APP}" || -z "${PROBLEM}" || -z "${PATTERN}" || -z "${TESTNAME}" ]] ; then
+	if [[ -z "${APP}" || -z "${PROBLEM}" || -z "${PATTERN}" || -z "${RUNNAME}" ]] ; then
 		usage
 		exit 1
 	fi
 
 	JSON=${HOMEDIR}/patterns/${APP}/${PROBLEM}/${PATTERN}.json
 
-	mkdir -p ${SCALINGDIR}/${TESTNAME}/${APP}/${PROBLEM}/${PATTERN}
+	mkdir -p ${SCALINGDIR}/${RUNNAME}/${APP}/${PROBLEM}/${PATTERN}
 			
-	cd ${SCALINGDIR}/${TESTNAME}/${APP}/${PROBLEM}/${PATTERN}
+	cd ${SCALINGDIR}/${RUNNAME}/${APP}/${PROBLEM}/${PATTERN}
 
 	if [[ "${OPENMP}" -eq "1" ]]; then
 		for thread in ${threadlist[@]}; do
@@ -139,12 +139,12 @@ else
 	
 		if [[ "${PLOT}" -eq "1" ]]; then
 			cd ${HOMEDIR}
-			mkdir -p figures/${TESTNAME}/${APP}/${PROBLEM}/${PATTERN}
+			mkdir -p figures/${RUNNAME}/${APP}/${PROBLEM}/${PATTERN}
 			echo "Plotting Results..."
-			python3 scripts/plot_mpi.py ${SCALINGDIR}/${TESTNAME}/${APP}/${PROBLEM}/${PATTERN} ${TESTNAME}
+			python3 scripts/plot_mpi.py ${SCALINGDIR}/${RUNNAME}/${APP}/${PROBLEM}/${PATTERN} ${RUNNAME}
 			echo ""
 		fi
 	fi
 
-	echo "See ${SCALINGDIR}/${TESTNAME}/${APP}/${PROBLEM}/${PATTERN} for results"
+	echo "See ${SCALINGDIR}/${RUNNAME}/${APP}/${PROBLEM}/${PATTERN} for results"
 fi

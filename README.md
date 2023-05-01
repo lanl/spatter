@@ -73,7 +73,7 @@ The `scripts/scaling.sh` script has the following options:
 	a: Application name
 	p: Problem name
 	f: Pattern name
-	n: Architecture/Partition
+	n: User-defined run name (for saving results)
 	c: Core binding (optional, default: off)
         g: Plotting/Post-processing (optional, default: on)
 	r: Toggle MPI scaling (optional, default: off)
