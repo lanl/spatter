@@ -65,16 +65,14 @@ The `scripts/scaling.sh` script has the following options:
 - h: Print usage message
 
 The Application name, Problem name, and Pattern name each correspond to subdirectories in this repository containing patterns stored as Spatter JSON input files.
-The JSON file of interest should be located at <Arch>/<Application>/<Problem>/<Pattern>.json
 
 Current options for Application name, Problem name, and Pattern name are listed below:
 - Application name: flag, xrage
 - Problem name: static_2d, asteroid
 - Pattern name: 001 (for flag only), 001.fp (for flag only), 001.nonfp (for flag only), or spatter (for xrage only)
 
-The results of the scaling experiment will be stored in the spatter.weakscaling or spatter.strongscaling directory, within the <Arch>/<Application>/<Problem>/<Pattern> subdirectory.
 
-If MPI scaling is enabled, full bandwidth results will be stored in the `mpi_<ranks>r)1t.txt` files. Additionally, the <rank>r subdirectories hold sorted bandwidth data for each rank from each pattern that was found in the Spatter JSON input file. These files will be labeled `<ranks>r/<ranks>r_1t_<pattern_num>p.txt`.
+If MPI scaling is enabled, full bandwidth results will be stored in the `mpi_\<ranks\>r_1t.txt` files. Additionally, the \<rank\>r subdirectories hold sorted bandwidth data for each rank from each pattern that was found in the Spatter JSON input file. These files will be labeled `\<ranks\>r/\<ranks\>r_1t_\<pattern_num\>p.txt`.
 
 
 #### Examples
