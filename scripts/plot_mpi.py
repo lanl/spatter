@@ -50,13 +50,27 @@ for d in subdirs:
 
 plt.figure()
 
-for p in pattern_set:
+for count, p in enumerate(pattern_set):
 
     sub_df = df.loc[df['pattern'] == p]
     ranks = list(sub_df['ranks'])
     totals = list(sub_df['Total Bandwidth (MB/s)'])
 
     ranks, totals = zip(*sorted(zip(ranks, totals)))
+
+    if count == 0:
+        col = "Pattern (MB/s)"
+        with open(base + '/total.csv', "w") as fh:
+            fh.write(f'{col:<20} ')
+            for rank in ranks:
+                fh.write(f'{rank:<12} ')
+            fh.write('\n')
+
+    with open(base + '/total.csv', "a") as fh:
+        fh.write(f'{p:<20} ')
+        for total in totals:
+            fh.write(f'{total:<12.2f} ')
+        fh.write('\n')
 
     if list(sub_df['Type'])[0] == 'Gather':
         marker = '-o'
@@ -82,13 +96,28 @@ plt.savefig(os.getcwd() + '/figures/' + arch + '/' + app + '/' + problem + '/' +
 
 plt.figure()
 
-for p in pattern_set:
+for count, p in enumerate(pattern_set):
 
     sub_df = df.loc[df['pattern'] == p]
     ranks = list(sub_df['ranks'])
     averages = list(sub_df['Average Bandwidth per Rank (MB/s)'])
 
     ranks, averages = zip(*sorted(zip(ranks, averages)))
+
+    if count == 0:
+        col = "Pattern (MB/s)"
+        with open(base + '/average.csv', "w") as fh:
+            fh.write(f'{col:<20} ')
+            for rank in ranks:
+                fh.write(f'{rank:<12} ')
+            fh.write('\n')
+
+    with open(base + '/average.csv', "a") as fh:
+        fh.write(f'{p:<20}' + ' ')
+        for average in averages:
+            fh.write(f'{average:<12.2f} ')
+        fh.write('\n')
+
 
     if list(sub_df['Type'])[0] == 'Gather':
         marker = '-o'
