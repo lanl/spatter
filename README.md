@@ -136,13 +136,11 @@ See the main [Spatter](https://github.com/hpcgarage/spatter) repository for more
 
 #### Building Spatter on CPUs
 ```
-cd ${HOMEDIR}
 bash scripts/build_cpu.sh
 ```
 
 #### Building Spatter on NVIDIA GPUs
 ```
-cd ${HOMEDIR}
 bash scripts/builds_cuda.sh
 ```
 
