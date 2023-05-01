@@ -85,13 +85,13 @@ else
 		export OMP_NUM_THREADS=1
 		for i in ${!ranklist[*]}; do
 			if [[ "${BINDING}" -eq "1" ]]; then	
-				CMD="srun -n ${ranklist[i]} --cpu-bind=core ${SPATTER} -pFILE=${JSON} -q3"
+				CMD="srun -n ${ranklist[i]} --cpu-bind=core ${SPATTER} -pFILE=${JSON} -e ${boundarylist[i]} -q3"
 				if [[ "${WEAKSCALING}" -ne "1" ]]; then
 					cp ${JSON} ${JSON}.orig
 					sed -Ei 's/\}/\, "pattern-size": '${sizelist[i]}'\}/g' ${JSON}
 				fi
 			else
-				CMD="srun -n ${ranklist[i]} ${SPATTER} -pFILE=${JSON} -q3"
+				CMD="srun -n ${ranklist[i]} ${SPATTER} -pFILE=${JSON} -e ${boundarylist[i]} -q3"
 				if [[ "${WEAKSCALING}" -ne "1" ]]; then
 					cp ${JSON} ${JSON}.orig
 					sed -Ei 's/\}/\"pattern-size": '${sizelist[i]}'\}/g' ${JSON}

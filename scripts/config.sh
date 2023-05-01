@@ -5,4 +5,5 @@ MODULEFILE=
 SPATTER=
 
 ranklist=
+boundarylist=
 sizelist=

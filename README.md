@@ -44,7 +44,8 @@ This setup script performs the following:
    - MODULEFILE is set to `modules/custom.mod`
    - SPATTER is set to path of the Spatter executable
    - ranklist is set to sweep from 1-36 threads/ranks respectively for a CTS-1 type system
-   - sizelist is set to reasonable defaults for strong scaling experiments (specifies the size of the pattern to truncate at)
+   - boundarylist is set to reasonable defaults for scaling experiments (specifies the maximum value of a pattern index, limiting the size of the data array)
+   - (STRONG SCALING ONLY) sizelist is set to reasonable defaults for strong scaling experiments (specifies the size of the pattern to truncate at)
 4. Attempts to build Spatter with CMake, GCC, and MPI
    - You will need GCC and MPI loaded into your environment (include them in your `modules/custom.mod`)
 
@@ -124,9 +125,10 @@ Edit the configuration bash script
 
 - Change the HOMEDIR to the path to the root of this repository (absolute path).
 - Change the MODULEFILE to your new module file (absolute path).
-- Change ranklist as appropriate for your system. This sets the number of MPI ranks Spatter will scale through.
-- Change sizelist as appropriate for strong scaling experiments. This defines the pattern length to truncate at as we scale. The defaults provided should work for the provided patterns. Only change if you know what you are doing.
 - You may leave SPATTER unchanged unless you have another Spatter binary on your system. If so, you may update this variable to point to you Spatter binary.
+- Change ranklist as appropriate for your system. This sets the number of MPI ranks Spatter will scale through.
+- Change the boundarylist as appropriate for scaling experiments. This defines the largest index that can exist in the pattern array. Any indices larger will be truncated by x % boundary. This in turn, limits the size of the data array, since it has extent max(pattern). Only change if you know what you are doing.
+- (STRONG SCALING ONLY) Change sizelist as appropriate for strong scaling experiments. This defines the pattern length to truncate at as we scale. The defaults provided should work for the provided patterns. Only change if you know what you are doing.
 
 ### Building Spatter
 
