@@ -20,7 +20,7 @@ sed -i "s|MODULEFILE=.*|MODULEFILE=$HOMEDIR\/modules\/custom.mod|g" scripts/conf
 sed -i "s|SPATTER=.*|SPATTER=$HOMEDIR\/spatter\/build_omp_mpi_gnu\/spatter|g" scripts/config.sh
 
 sed -i "s|ranklist=.*|ranklist=\( 1 2 4 8 16 18 32 36 \)|g" scripts/config.sh
-sed -i "s|boundarylist=.*|boundarylist\( 81920 40960 20480 10240 5120 4550 2560 2275 \)|g" scripts/config.sh
+sed -i "s|boundarylist=.*|boundarylist=\( 81920 40960 20480 10240 5120 4550 2560 2275 \)|g" scripts/config.sh
 sed -i "s|sizelist=.*|sizelist=\( 16384 8192 4096 2048 1024 910 512 455 \)|g" scripts/config.sh
 echo ""
 
