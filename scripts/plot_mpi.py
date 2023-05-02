@@ -1,7 +1,12 @@
+# Los Alamos National Laboratory
+# Author: Jered Dominguez-Trujillo
+
 import os
 import sys
+import csv
 import matplotlib.pyplot as plt
 import pandas as pd
+
 
 base = os.getcwd() + '/' + sys.argv[1]
 
@@ -50,34 +55,29 @@ for d in subdirs:
 
 plt.figure()
 
-for count, p in enumerate(pattern_set):
+with open(base + '/total.csv', 'w', newline='') as tfile:
+    totalwriter = csv.writer(tfile)
+    for count, p in enumerate(pattern_set):
+        sub_df = df.loc[df['pattern'] == p]
+        ranks = list(sub_df['ranks'])
+        totals = list(sub_df['Total Bandwidth (MB/s)'])
 
-    sub_df = df.loc[df['pattern'] == p]
-    ranks = list(sub_df['ranks'])
-    totals = list(sub_df['Total Bandwidth (MB/s)'])
+        ranks, totals = zip(*sorted(zip(ranks, totals)))
 
-    ranks, totals = zip(*sorted(zip(ranks, totals)))
+        if count == 0:
+            totalwriter.writerow(['Pattern'] + list(ranks))
+            tfile.flush()
 
-    if count == 0:
-        col = "Pattern (MB/s)"
-        with open(base + '/total.csv', "w") as fh:
-            fh.write(f'{col:<20} ')
-            for rank in ranks:
-                fh.write(f'{rank:<12} ')
-            fh.write('\n')
-
-    with open(base + '/total.csv', "a") as fh:
-        fh.write(f'{p:<20} ')
-        for total in totals:
-            fh.write(f'{total:<12.2f} ')
-        fh.write('\n')
-
-    if list(sub_df['Type'])[0] == 'Gather':
-        marker = '-o'
-    else:
-        marker = '--o'
+        rounded_totals = [round(val, 2) for val in totals]
+        totalwriter.writerow([p] + rounded_totals)
+        tfile.flush()
+ 
+        if list(sub_df['Type'])[0] == 'Gather':
+            marker = '-o'
+        else:
+            marker = '--o'
             
-    plt.plot(ranks, totals, marker,  label='Pattern ' + str(p))
+        plt.plot(ranks, totals, marker,  label='Pattern ' + str(p))
 
 plt.xlabel('Ranks')
 plt.ylabel('Total Bandwidth (MB/s)')
@@ -96,35 +96,29 @@ plt.savefig(os.getcwd() + '/figures/' + arch + '/' + app + '/' + problem + '/' +
 
 plt.figure()
 
-for count, p in enumerate(pattern_set):
+with open(base + '/average.csv', 'w', newline='') as afile:
+    averagewriter = csv.writer(afile)
+    for count, p in enumerate(pattern_set):
+        sub_df = df.loc[df['pattern'] == p]
+        ranks = list(sub_df['ranks'])
+        averages = list(sub_df['Average Bandwidth per Rank (MB/s)'])
 
-    sub_df = df.loc[df['pattern'] == p]
-    ranks = list(sub_df['ranks'])
-    averages = list(sub_df['Average Bandwidth per Rank (MB/s)'])
+        ranks, averages = zip(*sorted(zip(ranks, averages)))
 
-    ranks, averages = zip(*sorted(zip(ranks, averages)))
+        if count == 0:
+            averagewriter.writerow(['Pattern'] + list(ranks))
+            afile.flush()
 
-    if count == 0:
-        col = "Pattern (MB/s)"
-        with open(base + '/average.csv', "w") as fh:
-            fh.write(f'{col:<20} ')
-            for rank in ranks:
-                fh.write(f'{rank:<12} ')
-            fh.write('\n')
+        rounded_averages = [round(val, 2) for val in averages]
+        averagewriter.writerow([p] + rounded_averages)
+        afile.flush() 
 
-    with open(base + '/average.csv', "a") as fh:
-        fh.write(f'{p:<20}' + ' ')
-        for average in averages:
-            fh.write(f'{average:<12.2f} ')
-        fh.write('\n')
-
-
-    if list(sub_df['Type'])[0] == 'Gather':
-        marker = '-o'
-    else:
-        marker = '--o'
+        if list(sub_df['Type'])[0] == 'Gather':
+            marker = '-o'
+        else:
+            marker = '--o'
             
-    plt.plot(ranks, averages, marker,  label='Pattern ' + str(p))
+        plt.plot(ranks, averages, marker,  label='Pattern ' + str(p))
 
 plt.xlabel('Ranks')
 plt.ylabel('Average Bandwidth per Rank (MB/s)')

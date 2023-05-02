@@ -79,6 +79,7 @@ else
 		echo "RANK LIST: ${ranklist[*]}"
 		echo "BINDING: ${BINDING}"
 	fi
+	echo ""
 
 	cd ${HOMEDIR}
 	source ${MODULEFILE}
