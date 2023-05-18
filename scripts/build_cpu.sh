@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source ./scripts/config.sh
+source ./scripts/cpu_config.sh
 
 cd ${HOMEDIR}
 source ${MODULEFILE}
