@@ -81,10 +81,10 @@ Weak-Scaling experiment with core-binding turned on and plotting enabled. Bounda
 
 ```
 bash scripts/scaling.sh -a flag -p static_2d -f 001 -n CTS1 -c -r -w
-
 ```
 
 Strong-Scaling experiment with plotting enabled. Boundary limiting using the values in boundarylist will be enabled by default. Results will be found in `spatter.strongscaling/A100/flag/static_2d/001` and Figures will be found in `figures/CTS1/flag/static_2d/001`.
+
 ```
 bash scripts/scaling.sh -a flag -p static_2d -f 001 -n A100 -r 
 ```
@@ -134,11 +134,13 @@ Edit the configuration bash script
 See the main [Spatter](https://github.com/hpcgarage/spatter) repository for more in depth instructions. We have included a few basic scripts to get you started. Modify as needed.
 
 #### Building Spatter on CPUs
+
 ```
 bash scripts/build_cpu.sh
 ```
 
 #### Building Spatter on NVIDIA GPUs
+
 ```
 bash scripts/builds_cuda.sh
 ```
