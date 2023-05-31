@@ -1,7 +1,7 @@
 #!/bin/bash
 
 usage() {
-	echo "Usage ./scaling.sh -a <application> -p <input problem> -f <pattern> -n <arch> [-b 'toggle boundary limit'] [-c 'toggle core binding'] [-g 'toggle gpu'] [-s 'toggle pattern size list'] [-t 'toggle throughput plots'] [-w 'toggle weak scaling'] [-x 'toggle plotting']
+	echo "Usage ./mpirunscaling.sh -a <application> -p <input problem> -f <pattern> -n <arch> [-b 'toggle boundary limit'] [-c 'toggle core binding'] [-g 'toggle gpu'] [-s 'toggle pattern size list'] [-t 'toggle throughput plots'] [-w 'toggle weak scaling'] [-x 'toggle plotting']
 		-a : Specify the name of the application (see available apps in the patterns sub-directory)
 		-p : Specify the name of the input problem (see available problems in the application sub-directory)
 		-f : Specify the base name of the input JSON file containing the gather/scatter pattern (see available patterns in the input problem subdirectory)
@@ -26,6 +26,7 @@ else
 	PSIZE=0
 	GPU=0
 	THROUGHPUT=0
+	FACTOR=1024
 	while getopts "a:f:p:n:bcgstwx" opt; do
 		case $opt in 
 			a) APP=$OPTARG
@@ -63,7 +64,7 @@ else
 
 	export OMP_NUM_THREADS=1
 	
-	echo "Running scaling.sh:"
+	echo "Running mpirunscaling.sh:"
 	echo "APP: ${APP}"
 	echo "PROBLEM: ${PROBLEM}"
 	echo "PATTERN: ${PATTERN}"
@@ -146,9 +147,7 @@ else
 				sed -Ei 's/\}/\, "pattern-size": '${sizelist[i]}'\}/g' ${JSON}
 
 				if [[ "${GPU}" -eq "1" ]]; then
-					echo "${sizelist[i]}"
-					COUNT=$((sizelist[i] * 1024))
-					echo "${COUNT}"
+					COUNT=$((sizelist[i] * ${FACTOR}))
 					sed -Ei 's/"count":1/"count": '${COUNT}'/g' ${JSON}
 				fi
 
@@ -160,9 +159,7 @@ else
 					sed -Ei 's/\}/\, "pattern-size": '${sizelist[i]}'\}/g' ${JSON}
 
 					if [[ "${GPU}" -eq "1" ]]; then
-						echo "${sizelist[i]}"
-						COUNT=$((sizelist[i] * 1024))
-						echo "${COUNT}"
+						COUNT=$((sizelist[i] * ${FACTOR}))
 						sed -Ei 's/"count":1/"count": '${COUNT}'/g' ${JSON}
 					fi
 				fi
@@ -188,9 +185,7 @@ else
 				sed -Ei 's/\}/\, "pattern-size": '${sizelist[i]}'\}/g' ${JSON}
 
 				if [[ "${GPU}" -eq "1" ]]; then
-					echo "${sizelist[i]}"
-					COUNT=$((sizelist[i] * 1024))
-					echo "${COUNT}"
+					COUNT=$((sizelist[i] * ${FACTOR}))
 					sed -Ei 's/"count":1/"count": '${COUNT}'/g' ${JSON}
 				fi
 
@@ -202,9 +197,7 @@ else
 					sed -Ei 's/\}/\, "pattern-size": '${sizelist[i]}'\}/g' ${JSON}
 				
 					if [[ "${GPU}" -eq "1" ]]; then
-						echo "${sizelist[i]}"
-						COUNT=$((sizelist[i] * 1024))
-						echo "${COUNT}"
+						COUNT=$((sizelist[i] * ${FACTOR}))
 						sed -Ei 's/"count":1/"count": '${COUNT}'/g' ${JSON}
 					fi
 				fi
@@ -237,11 +230,11 @@ else
 	
 	if [[ "${PLOT}" -eq "1" ]]; then
 		cd ${HOMEDIR}
-		mkdir -p figures/${RUNNAME}/${APP}/${PROBLEM}/${PATTERN}
+		mkdir -p figures/${SCALINGDIR}/${RUNNAME}/${APP}/${PROBLEM}/${PATTERN}
 		echo "Plotting Results..."
-		python3 scripts/plot_mpi.py ${SCALINGDIR}/${RUNNAME}/${APP}/${PROBLEM}/${PATTERN} ${RUNNAME} ${THROUGHPUT}
+		python3 scripts/plot_mpi.py ${SCALINGDIR}/${RUNNAME}/${APP}/${PROBLEM}/${PATTERN} ${RUNNAME} ${WEAKSCALING} ${THROUGHPUT}
 		echo ""
 	fi
 
-	echo "See ${SCALINGDIR}/${RUNNAME}/${APP}/${PROBLEM}/${PATTERN} for results"
+	echo "See ${SCALINGDIR}/${RUNNAME}/${APP}/${PROBLEM}/${PATTERN} and figures/${SCALINGDIR}/${RUNNAME}/${APP}/${PROBLEM}/${PATTERN} for results"
 fi
