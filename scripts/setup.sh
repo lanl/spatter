@@ -66,8 +66,8 @@ if [[ "${GPUBUILD}" -eq "1" ]]; then
 	sed -i "s|SPATTER=.*|SPATTER=$HOMEDIR\/spatter\/build_cuda\/spatter|g" scripts/gpu_config.sh
 
 	sed -i "s|ranklist=.*|ranklist=\( 1 1 1 1 1 1 1 1 \)|g" scripts/gpu_config.sh
-	sed -i "s|boundarylist=.*|boundarylist=\( 81920 40960 20480 10240 5120 4550 2560 2275 \)|g" scripts/gpu_config.sh
-	sed -i "s|sizelist=.*|sizelist=\( 16384 8192 4096 2048 1024 512 256 128 \)|g" scripts/gpu_config.sh
+	sed -i "s|boundarylist=.*|boundarylist=\( 81920 40960 20480 10240 5120 2560 1280 640 \)|g" scripts/gpu_config.sh
+	sed -i "s|sizelist=.*|sizelist=\( 4096 2048 1024 512 256 128 64 32 \)|g" scripts/gpu_config.sh
 	echo ""
 
 	echo "Building Spatter on GPU..."
