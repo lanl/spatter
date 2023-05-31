@@ -1,6 +1,7 @@
 #!/bin/bash
 
-source ./scripts/cpu_config.sh
+echo ${HOMEDIR}
+source ${HOMEDIR}/scripts/cpu_config.sh
 
 cd ${HOMEDIR}
 source ${MODULEFILE}

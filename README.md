@@ -24,10 +24,17 @@ cd spatter
 ```
 
 ### Setup
-The setup script will initialize your configuration file (`scripts/config.sh`) with CTS-1 defaults, and will build Spatter with GCC and MPI for the CPU. See the [Spatter documentation](https://github.com/hpcgarage/spatter) and other build scripts (`scripts/build_cpu.sh` and `scripts/build_cuda.sh`) for further instructions for building with different compilers or for GPUs.
+The setup script will initialize your CPU configuration file (`scripts/cpu_config.sh`) with CTS-1 defaults and the GPU configuration file (`scripts/gpu_config.sh`) with A100 defaults, and will build Spatter for CPU and GPU. See the [Spatter documentation](https://github.com/hpcgarage/spatter) and other build scripts (`scripts/build_cpu.sh` and `scripts/build_cuda.sh`) for further instructions for building with different compilers or for GPUs.
+
+The `scripts/setup.sh` script has the following options:
+- c: Toggle CPU Build (default: off)
+- g: Toggle GPU Build (default: off)
+- h: Print usage message
+
+To setup and build for both the CPU and GPU, run the following:
 
 ```
-bash scripts/setup.sh
+bash scripts/setup.sh -c -g
 ```
 
 This setup script performs the following:
@@ -53,23 +60,10 @@ This setup script performs the following:
    - ranklist is set to a constant of 1 for 8 different runs (8 single-GPU runs)
    - boundarylist is set to reasonable defaults for throughput experiments (specifies the maximum value of a pattern index, limiting the size of the data array)
    - sizelist is set to reasonable defaults for throughput experiments (specifies the size of the pattern to truncate at)
+5. Attempts to build Spatter on CPU with CMake, GCC, and MPI and on GPU with CMake and nvcc
+   - You will need CMake, GCC, and MPI loaded into your environment for the CPU build (include them in your modules/cpu.mod)
+   - You will need CMake, cuda, and nvcc loaded into your environment for the GPU build (include them in your modules/gpu.mod)
 
-
-### Build on CPU
-Attempts to build Spatter with CMake, GCC, and MPI
-   - You will need GCC and MPI loaded into your environment (include them in your `modules/custom.mod`)
-
-```
-bash scripts/build_cpu.sh
-
-```
-
-### Build on GPU
-Attempts to build Spatter on NVIDIA GPUs with nvcc (no MPI)
-
-```
-bash scripts/build_cuda.sh
-```
 
 ### Running a Scaling Experiment
 This will perform a weak scaling experiment 
