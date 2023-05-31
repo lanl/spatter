@@ -61,11 +61,6 @@ else
 		source ./scripts/cpu_config.sh
 	fi
 
-	if [[ "${PLOT}" -ne "1" ]]; then
-		echo "Plotting disabled, turning off throughput plots"
-		THROUGHPUT=0
-	fi	
-
 	export OMP_NUM_THREADS=1
 	
 	echo "Running scaling.sh:"
@@ -139,18 +134,37 @@ else
 		if [[ "${BINDING}" -eq "1" ]]; then	
 			CMD="mpirun -n ${ranklist[i]} --bind-to=core ${SPATTER} -pFILE=${JSON} -q3"
 			cp ${JSON} ${JSON}.orig
-			
+		
+			if [[ "${GPU}" -eq "1" ]]; then
+				sed -Ei 's/\}/\, "local-work-size": 1024\}/g' ${JSON}
+			fi
+	
 			# Strong Scaling
 			if [[ "${WEAKSCALING}" -ne "1" ]]; then
 				SFILE="_${sizelist[i]}s"
 				BFILE="_${boundarylist[i]}b"
 				sed -Ei 's/\}/\, "pattern-size": '${sizelist[i]}'\}/g' ${JSON}
+
+				if [[ "${GPU}" -eq "1" ]]; then
+					echo "${sizelist[i]}"
+					COUNT=$((sizelist[i] * 1024))
+					echo "${COUNT}"
+					sed -Ei 's/"count":1/"count": '${COUNT}'/g' ${JSON}
+				fi
+
 				sed -Ei 's/\}/\, "boundary": '${boundarylist[i]}'\}/g' ${JSON}
 			# Weak Scaling
 			else
 				if [[ "${PSIZE}" -eq "1" ]]; then
 					SFILE="_${sizelist[i]}s"
-					sed -Ei 's/\}/\"pattern-size": '${sizelist[i]}'\}/g' ${JSON}
+					sed -Ei 's/\}/\, "pattern-size": '${sizelist[i]}'\}/g' ${JSON}
+
+					if [[ "${GPU}" -eq "1" ]]; then
+						echo "${sizelist[i]}"
+						COUNT=$((sizelist[i] * 1024))
+						echo "${COUNT}"
+						sed -Ei 's/"count":1/"count": '${COUNT}'/g' ${JSON}
+					fi
 				fi
 
 				if [[ "${BOUNDARY}" -eq "1" ]]; then
@@ -162,23 +176,42 @@ else
 		else
 			CMD="mpirun -n ${ranklist[i]} ${SPATTER} -pFILE=${JSON} -q3"
 			cp ${JSON} ${JSON}.orig
+			
+			if [[ "${GPU}" -eq "1" ]]; then
+				sed -Ei 's/\}/\, "local-work-size": 1024\}/g' ${JSON}
+			fi
 
 			# Strong Scaling
 			if [[ "${WEAKSCALING}" -ne "1" ]]; then
 				SFILE="_${sizelist[i]}s"
 				BFILE="_${boundarylist[i]}b"
-				sed -Ei 's/\}/\"pattern-size": '${sizelist[i]}'\}/g' ${JSON}
-				sed -Ei 's/\}/\"boundary": '${boundarylist[i]}'\}\g' ${JSON}
+				sed -Ei 's/\}/\, "pattern-size": '${sizelist[i]}'\}/g' ${JSON}
+
+				if [[ "${GPU}" -eq "1" ]]; then
+					echo "${sizelist[i]}"
+					COUNT=$((sizelist[i] * 1024))
+					echo "${COUNT}"
+					sed -Ei 's/"count":1/"count": '${COUNT}'/g' ${JSON}
+				fi
+
+				sed -Ei 's/\}/\, "boundary": '${boundarylist[i]}'\}/g' ${JSON}
 			# Weak Scaling
 			else	
 				if [[ "${PSIZE}" -eq "1" ]]; then
 					SFILE="_${sizelist[i]}s"
-					sed -Ei 's/\}/\"pattern-size": '${sizelist[i]}'\}/g' ${JSON}
+					sed -Ei 's/\}/\, "pattern-size": '${sizelist[i]}'\}/g' ${JSON}
+				
+					if [[ "${GPU}" -eq "1" ]]; then
+						echo "${sizelist[i]}"
+						COUNT=$((sizelist[i] * 1024))
+						echo "${COUNT}"
+						sed -Ei 's/"count":1/"count": '${COUNT}'/g' ${JSON}
+					fi
 				fi
 
 				if [[ "${BOUNDARY}" -eq "1" ]]; then
 					BFILE="_${boundarylist[i]}b"
-					sed -Ei 's/\}/\"boundary": '${boundarylist[i]}'\}\g' ${JSON}
+					sed -Ei 's/\}/\, "boundary": '${boundarylist[i]}'\}/g' ${JSON}
 				fi
 			fi
 		fi
