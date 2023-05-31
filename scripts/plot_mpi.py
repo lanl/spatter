@@ -7,7 +7,7 @@ import csv
 import matplotlib.pyplot as plt
 import pandas as pd
 
-def scaling(base, app, problem, func, nonfp, fp, arch, subdirs, pfile, gs_types):
+def generate_scaling(base, app, problem, func, nonfp, fp, arch, subdirs, pfile, gs_types):
     df = pd.DataFrame(columns=['ranks', 'pattern', 'Total Bandwidth (MB/s)', 'Average Bandwidth per Rank (MB/s)', 'Type'])
 
     rank_set = set()
@@ -33,7 +33,7 @@ def scaling(base, app, problem, func, nonfp, fp, arch, subdirs, pfile, gs_types)
     return df, pattern_set
 
     
-def throughput(base, app, problem, func, nonfp, fp, arch, subdirs, pfile, gs_types):
+def generate_throughput(base, app, problem, func, nonfp, fp, arch, subdirs, pfile, gs_types):
     df = pd.DataFrame(columns=['ranks', 'size', 'boundary', 'pattern', 'Total Bandwidth (MB/s)', 'Average Bandwidth per Rank (MB/s)', 'Type'])
 
     ranks_list = []
@@ -65,7 +65,7 @@ def throughput(base, app, problem, func, nonfp, fp, arch, subdirs, pfile, gs_typ
     return df, pattern_set
 
 
-def generat_plots(throughput, df, pattern_set, key, xlab, ctitle1, ctitle2):
+def generate_plots(throughput, df, pattern_set, base, app, problem, func, nonfp, fp, arch, key, xlab, ctitle1, ctitle2):
     plt.figure()
 
     with open(base + '/total.csv', 'w', newline='') as tfile:
@@ -119,20 +119,20 @@ def generat_plots(throughput, df, pattern_set, key, xlab, ctitle1, ctitle2):
 
             xvals, averages = zip(*sorted(zip(ranks, xvals)))
 
-                if count == 0:
-                    averagewriter.writerow(['Pattern'] + list(ranks))
-                    afile.flush()
+            if count == 0:
+                averagewriter.writerow(['Pattern'] + list(ranks))
+                afile.flush()
 
-                rounded_averages = [round(val, 2) for val in averages]
-                averagewriter.writerow([p] + rounded_averages)
-                afile.flush() 
+            rounded_averages = [round(val, 2) for val in averages]
+            averagewriter.writerow([p] + rounded_averages)
+            afile.flush() 
 
-                if list(sub_df['Type'])[0] == 'Gather':
-                    marker = '-o'
-                else:
-                    marker = '--o'
+            if list(sub_df['Type'])[0] == 'Gather':
+                marker = '-o'
+            else:
+                marker = '--o'
             
-                plt.plot(xvals, averages, marker,  label='Pattern ' + str(p))
+            plt.plot(xvals, averages, marker,  label='Pattern ' + str(p))
 
         plt.xlabel(xlab)
         plt.ylabel('Average Bandwidth per Rank (MB/s)')
@@ -176,12 +176,12 @@ def main():
 
     if throughput == 0:
         print("Generating Scaling Plots")
-        sdf, pattern_set = scaling(base, app, problem, func, nonfp, fp, arch, subdirs, pfile, gs_types)
-        generate_plots(throughput, sdf, pattern_set, 'rank', 'Ranks', 'Total Bandwidths', 'Average Bandwidth per Rank')
+        sdf, pattern_set = generate_scaling(base, app, problem, func, nonfp, fp, arch, subdirs, pfile, gs_types)
+        generate_plots(throughput, sdf, pattern_set, base, app, problem, func, nonfp, fp, arch, 'rank', 'Ranks', 'Total Bandwidths', 'Average Bandwidth per Rank')
     else:
         print("Generating Throughput Plots")
-        tdf, pattern_set = throughput(base, app, problem, func, nonfp, fp, arch, subdirs, pfile, gs_types)
-        generate_plots(throughput, tdf, pattern_set, 'size', 'Pattern Size', 'Throughput', '')
+        tdf, pattern_set = generate_throughput(base, app, problem, func, nonfp, fp, arch, subdirs, pfile, gs_types)
+        generate_plots(throughput, tdf, pattern_set, base, app, problem, func, nonfp, fp, arch, 'size', 'Pattern Size', 'Throughput', '')
 
 if __name__ == "__main__":
     main()
