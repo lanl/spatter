@@ -34,31 +34,28 @@ def generate_scaling(base, app, problem, func, nonfp, fp, arch, subdirs, pfile, 
 
     
 def generate_throughput(base, app, problem, func, nonfp, fp, arch, subdirs, pfile, gs_types):
-    df = pd.DataFrame(columns=['ranks', 'size', 'boundary', 'pattern', 'Total Bandwidth (MB/s)', 'Average Bandwidth per Rank (MB/s)', 'Type'])
+    df = pd.DataFrame(columns=['ranks', 'count', 'pattern', 'Total Bandwidth (MB/s)', 'Average Bandwidth per Rank (MB/s)', 'Type'])
 
     ranks_list = []
-    boundary_list = []
-    size_list = []
+    count_list = []
     pattern_set = set()
     for d in subdirs:
         f_list = [os.path.join(d, x) for x in os.listdir(d) if os.path.isfile(os.path.join(d, x))]
     
         for f in f_list:
             ranks = int(d.split('/')[-1][:-1]) 
-            boundary = int(f.split('/')[-1].split('_')[-2][:-1])
-            sz = int(f.split('/')[-1].split('_')[-3][:-1])
+            count = int(f.split('/')[-1].split('_')[-2][:-1])
             pattern = int(f.split('/')[-1].split('_')[-1][:-5])
 
             ranks_list.append(ranks)
-            boundary_list.append(boundary)
-            size_list.append(sz)
+            count_list.append(count)
             pattern_set.add(pattern)
         
             gs_type = gs_types[pattern]
 
             df_tmp = pd.read_csv(f, header=None)
             df_tmp = df_tmp.astype(float)
-            row = [ranks, sz, boundary, pattern, df_tmp[0].sum(), df_tmp[0].mean(), gs_type]
+            row = [ranks, count, pattern, df_tmp[0].sum(), df_tmp[0].mean(), gs_type]
 
             df.loc[len(df)] = row
 
@@ -92,15 +89,18 @@ def generate_plots(throughput, scaling, df, pattern_set, base, app, problem, fun
             
             plt.plot(xvals, totals, marker,  label='Pattern ' + str(p))
 
+    if throughput:
+        plt.xscale('log', base=2)
+
     plt.xlabel(xlab)
     plt.ylabel('Total Bandwidth (MB/s)')
 
     if fp:
-        plt.title(app + ', ' + problem + ': FP Gather/Scatter ' + ctitle1 + ' (' + arch + ')')
+        plt.title(app + ', ' + problem + ': FP Gather/Scatter ' + ctitle1 + ' (' + arch + ')', y=1.1)
     elif nonfp:
-        plt.title(app + ', ' + problem + ': Non-FP Gather/Scatter ' + ctitle1 + ' (' + arch + ')')
+        plt.title(app + ', ' + problem + ': Non-FP Gather/Scatter ' + ctitle1 + ' (' + arch + ')', y=1.1)
     else:
-        plt.title(app + ', ' + problem + ': Gather/Scatter ' + ctitle1 + ' (' + arch + ')')
+        plt.title(app + ', ' + problem + ': Gather/Scatter ' + ctitle1 + ' (' + arch + ')', y=1.1)
 
     plt.legend()
 
@@ -137,11 +137,11 @@ def generate_plots(throughput, scaling, df, pattern_set, base, app, problem, fun
         plt.xlabel(xlab)
         plt.ylabel('Average Bandwidth per Rank (MB/s)')
         if fp:
-            plt.title(app + ', ' + problem + ': FP Gather/Scatter ' + ctitle2 + ' (' + arch + ')')
+            plt.title(app + ', ' + problem + ': FP Gather/Scatter ' + ctitle2 + ' (' + arch + ')', y=1.1)
         elif nonfp:
-            plt.title(app + ', ' + problem + ': Non-FP Gather/Scatter ' + ctitle2 + ' (' + arch + ')')
+            plt.title(app + ', ' + problem + ': Non-FP Gather/Scatter ' + ctitle2 + ' (' + arch + ')', y=1.1)
         else:
-            plt.title(app + ', ' + problem + ': Gather/Scatter ' + ctitle2 + ' (' + arch + ')')
+            plt.title(app + ', ' + problem + ': Gather/Scatter ' + ctitle2 + ' (' + arch + ')', y=1.1)
 
         plt.legend()
 
@@ -187,7 +187,7 @@ def main():
     else:
         print("Generating Throughput Plots")
         tdf, pattern_set = generate_throughput(base, app, problem, func, nonfp, fp, arch, subdirs, pfile, gs_types)
-        generate_plots(throughput, scaling, tdf, pattern_set, base, app, problem, func, nonfp, fp, arch, 'size', 'Pattern Size', 'Throughput', '')
+        generate_plots(throughput, scaling, tdf, pattern_set, base, app, problem, func, nonfp, fp, arch, 'count', '# of Gather/Scatter Ops', 'Throughput', '')
 
 if __name__ == "__main__":
     main()
