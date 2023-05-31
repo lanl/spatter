@@ -65,7 +65,7 @@ def generate_throughput(base, app, problem, func, nonfp, fp, arch, subdirs, pfil
     return df, pattern_set
 
 
-def generate_plots(throughput, df, pattern_set, base, app, problem, func, nonfp, fp, arch, key, xlab, ctitle1, ctitle2):
+def generate_plots(throughput, scaling, df, pattern_set, base, app, problem, func, nonfp, fp, arch, key, xlab, ctitle1, ctitle2):
     plt.figure()
 
     with open(base + '/total.csv', 'w', newline='') as tfile:
@@ -104,7 +104,7 @@ def generate_plots(throughput, df, pattern_set, base, app, problem, func, nonfp,
 
     plt.legend()
 
-    plt.savefig(os.getcwd() + '/figures/' + arch + '/' + app + '/' + problem + '/' + func + '/total.png', bbox_inches='tight')
+    plt.savefig(os.getcwd() + '/figures/' + scaling + '/' + arch + '/' + app + '/' + problem + '/' + func + '/total.png', bbox_inches='tight')
 
 
     if (not throughput):
@@ -145,7 +145,7 @@ def generate_plots(throughput, df, pattern_set, base, app, problem, func, nonfp,
 
         plt.legend()
 
-        plt.savefig(os.getcwd() + '/figures/' + arch + '/' + app + '/' + problem + '/' + func + '/average.png', bbox_inches='tight')
+        plt.savefig(os.getcwd() + '/figures/' + scaling + '/' + arch + '/' + app + '/' + problem + '/' + func + '/average.png', bbox_inches='tight')
 
 
 def main():
@@ -164,7 +164,13 @@ def main():
         nonfp = True
 
     arch = sys.argv[2]
-    throughput = int(sys.argv[3])
+    weakscaling = int(sys.argv[3])
+    throughput = int(sys.argv[4])
+
+    if weakscaling == 0:
+        scaling = 'spatter.strongscaling'
+    else:
+        scaling = 'spatter.weakscaling'
 
     subdirs = [x[0] for x in os.walk(base) if x[0] != base]
 
@@ -177,11 +183,11 @@ def main():
     if throughput == 0:
         print("Generating Scaling Plots")
         sdf, pattern_set = generate_scaling(base, app, problem, func, nonfp, fp, arch, subdirs, pfile, gs_types)
-        generate_plots(throughput, sdf, pattern_set, base, app, problem, func, nonfp, fp, arch, 'rank', 'Ranks', 'Total Bandwidths', 'Average Bandwidth per Rank')
+        generate_plots(throughput, scaling, sdf, pattern_set, base, app, problem, func, nonfp, fp, arch, 'rank', 'Ranks', 'Total Bandwidths', 'Average Bandwidth per Rank')
     else:
         print("Generating Throughput Plots")
         tdf, pattern_set = generate_throughput(base, app, problem, func, nonfp, fp, arch, subdirs, pfile, gs_types)
-        generate_plots(throughput, tdf, pattern_set, base, app, problem, func, nonfp, fp, arch, 'size', 'Pattern Size', 'Throughput', '')
+        generate_plots(throughput, scaling, tdf, pattern_set, base, app, problem, func, nonfp, fp, arch, 'size', 'Pattern Size', 'Throughput', '')
 
 if __name__ == "__main__":
     main()
