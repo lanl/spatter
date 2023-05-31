@@ -7,6 +7,6 @@ module purge
 
 module load \
 cmake \
-intel \
+gcc \
 openmpi
 
