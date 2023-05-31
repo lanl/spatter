@@ -26,7 +26,6 @@ else
 	PSIZE=0
 	GPU=0
 	THROUGHPUT=0
-	FACTOR=1024
 	while getopts "a:f:p:n:bcgstwx" opt; do
 		case $opt in 
 			a) APP=$OPTARG
@@ -106,6 +105,8 @@ else
 	if [[ "${GPU}" -eq "1" ]]; then
 		echo "GPU Run, turning off core binding"
 		BINDING=0
+		echo "GPU Run, Enabling countlist"
+		echo "COUNT LIST: ${countlist[*]}"
 	fi
 
 	echo "RANK LIST: ${ranklist[*]}"
@@ -128,8 +129,7 @@ else
 	cd ${SCALINGDIR}/${RUNNAME}/${APP}/${PROBLEM}/${PATTERN}
 
 	for i in ${!ranklist[*]}; do
-		SFILE=""
-		BFILE=""
+		CFILE=""
 
 		# Core Binding
 		if [[ "${BINDING}" -eq "1" ]]; then	
@@ -142,30 +142,26 @@ else
 	
 			# Strong Scaling
 			if [[ "${WEAKSCALING}" -ne "1" ]]; then
-				SFILE="_${sizelist[i]}s"
-				BFILE="_${boundarylist[i]}b"
 				sed -Ei 's/\}/\, "pattern-size": '${sizelist[i]}'\}/g' ${JSON}
 
 				if [[ "${GPU}" -eq "1" ]]; then
-					COUNT=$((sizelist[i] * ${FACTOR}))
-					sed -Ei 's/"count":1/"count": '${COUNT}'/g' ${JSON}
+					CFILE="_${countlist[i]}c"
+					sed -Ei 's/"count":1/"count": '${countlist[i]}'/g' ${JSON}
 				fi
 
 				sed -Ei 's/\}/\, "boundary": '${boundarylist[i]}'\}/g' ${JSON}
 			# Weak Scaling
 			else
 				if [[ "${PSIZE}" -eq "1" ]]; then
-					SFILE="_${sizelist[i]}s"
 					sed -Ei 's/\}/\, "pattern-size": '${sizelist[i]}'\}/g' ${JSON}
-
-					if [[ "${GPU}" -eq "1" ]]; then
-						COUNT=$((sizelist[i] * ${FACTOR}))
-						sed -Ei 's/"count":1/"count": '${COUNT}'/g' ${JSON}
-					fi
 				fi
-
+				
+				if [[ "${GPU}" -eq "1" ]]; then
+					CFILE="_${countlist[i]}c"
+					sed -Ei 's/"count":1/"count": '${countlist[i]}'/g' ${JSON}
+				fi
+				
 				if [[ "${BOUNDARY}" -eq "1" ]]; then
-					BFILE="_${boundarylist[i]}b"
 					sed -Ei 's/\}/\, "boundary": '${boundarylist[i]}'\}/g' ${JSON}
 				fi
 			fi
@@ -180,37 +176,33 @@ else
 
 			# Strong Scaling
 			if [[ "${WEAKSCALING}" -ne "1" ]]; then
-				SFILE="_${sizelist[i]}s"
-				BFILE="_${boundarylist[i]}b"
 				sed -Ei 's/\}/\, "pattern-size": '${sizelist[i]}'\}/g' ${JSON}
 
 				if [[ "${GPU}" -eq "1" ]]; then
-					COUNT=$((sizelist[i] * ${FACTOR}))
-					sed -Ei 's/"count":1/"count": '${COUNT}'/g' ${JSON}
+					CFILE="_${countlist[i]}c"
+					sed -Ei 's/"count":1/"count": '${countlist[i]}'/g' ${JSON}
 				fi
 
 				sed -Ei 's/\}/\, "boundary": '${boundarylist[i]}'\}/g' ${JSON}
 			# Weak Scaling
 			else	
 				if [[ "${PSIZE}" -eq "1" ]]; then
-					SFILE="_${sizelist[i]}s"
 					sed -Ei 's/\}/\, "pattern-size": '${sizelist[i]}'\}/g' ${JSON}
-				
-					if [[ "${GPU}" -eq "1" ]]; then
-						COUNT=$((sizelist[i] * ${FACTOR}))
-						sed -Ei 's/"count":1/"count": '${COUNT}'/g' ${JSON}
-					fi
+				fi
+
+				if [[ "${GPU}" -eq "1" ]]; then
+					CFILE="_${countlist[i]}c"
+					sed -Ei 's/"count":1/"count": '${countlist[i]}'/g' ${JSON}
 				fi
 
 				if [[ "${BOUNDARY}" -eq "1" ]]; then
-					BFILE="_${boundarylist[i]}b"
 					sed -Ei 's/\}/\, "boundary": '${boundarylist[i]}'\}/g' ${JSON}
 				fi
 			fi
 		fi
 
 		echo ${CMD}
-		${CMD} > mpi_${ranklist[i]}r${SFILE}${BFILE}.txt
+		${CMD} > mpi_${ranklist[i]}r${CFILE}.txt
 
 		mv ${JSON}.orig ${JSON}
 
@@ -220,9 +212,9 @@ else
 		num_patterns="$((num_patterns-1))"
 
 		for pattern in $(seq 0 ${num_patterns}); do
-			cat mpi_${ranklist[i]}r${SFILE}${BFILE}.txt | grep "^${pattern} " | awk '{print $3}' > ${ranklist[i]}r/${ranklist[i]}r${SFILE}${BFILE}_${pattern}p.txt.tmp
-			cat ${ranklist[i]}r/${ranklist[i]}r${SFILE}${BFILE}_${pattern}p.txt.tmp | awk '{$1=$1};1' > ${ranklist[i]}r/${ranklist[i]}r${SFILE}${BFILE}_${pattern}p.txt
-			rm ${ranklist[i]}r/${ranklist[i]}r${SFILE}${BFILE}_${pattern}p.txt.tmp
+			cat mpi_${ranklist[i]}r${CFILE}.txt | grep "^${pattern} " | awk '{print $3}' > ${ranklist[i]}r/${ranklist[i]}r${CFILE}_${pattern}p.txt.tmp
+			cat ${ranklist[i]}r/${ranklist[i]}r${CFILE}_${pattern}p.txt.tmp | awk '{$1=$1};1' > ${ranklist[i]}r/${ranklist[i]}r${CFILE}_${pattern}p.txt
+			rm ${ranklist[i]}r/${ranklist[i]}r${CFILE}_${pattern}p.txt.tmp
 		done
 	done
 
