@@ -60,9 +60,10 @@ This setup script performs the following:
    - ranklist is set to a constant of 1 for 8 different runs (8 single-GPU runs)
    - boundarylist is set to reasonable defaults for throughput experiments (specifies the maximum value of a pattern index, limiting the size of the data array)
    - sizelist is set to reasonable defaults for throughput experiments (specifies the size of the pattern to truncate at)
+   - countlist is set to reasonable defaults to control the number of gathers/             scatters performed by an experiment. This is the parameter that is varied to perform       throughput experiments.
 5. Attempts to build Spatter on CPU with CMake, GCC, and MPI and on GPU with CMake and nvcc
-   - You will need CMake, GCC, and MPI loaded into your environment for the CPU build (include them in your modules/cpu.mod)
-   - You will need CMake, cuda, and nvcc loaded into your environment for the GPU build (include them in your modules/gpu.mod)
+   - You will need CMake, GCC, and MPI loaded into your environment for the CPU build (include them in your `modules/cpu.mod`)
+   - You will need CMake, cuda, and nvcc loaded into your environment for the GPU build (include them in your `modules/gpu.mod`)
 
 
 ### Running a Scaling Experiment
