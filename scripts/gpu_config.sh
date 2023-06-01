@@ -7,3 +7,4 @@ SPATTER=
 ranklist=
 boundarylist=
 sizelist=
+countlist=
