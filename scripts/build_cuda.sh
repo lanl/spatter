@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo ${HOMEDIR}
-source ${HOMEDIR}/scripts/config.sh
+source ${HOMEDIR}/scripts/gpu_config.sh
 
 cd ${HOMEDIR}
 source ${MODULEFILE}

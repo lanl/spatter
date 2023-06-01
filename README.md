@@ -24,10 +24,17 @@ cd spatter
 ```
 
 ### Setup
-The setup script will initialize your configuration file (`scripts/config.sh`) with CTS-1 defaults, and will build Spatter with GCC and MPI for the CPU. See the [Spatter documentation](https://github.com/hpcgarage/spatter) and other build scripts (`scripts/build_cpu.sh` and `scripts/build_cuda.sh`) for further instructions for building with different compilers or for GPUs.
+The setup script will initialize your CPU configuration file (`scripts/cpu_config.sh`) with CTS-1 defaults and the GPU configuration file (`scripts/gpu_config.sh`) with A100 defaults, and will build Spatter for CPU and GPU. See the [Spatter documentation](https://github.com/hpcgarage/spatter) and other build scripts (`scripts/build_cpu.sh` and `scripts/build_cuda.sh`) for further instructions for building with different compilers or for GPUs.
+
+The `scripts/setup.sh` script has the following options:
+- c: Toggle CPU Build (default: off)
+- g: Toggle GPU Build (default: off)
+- h: Print usage message
+
+To setup and build for both the CPU and GPU, run the following:
 
 ```
-bash scripts/setup.sh
+bash scripts/setup.sh -c -g
 ```
 
 This setup script performs the following:
@@ -37,17 +44,26 @@ This setup script performs the following:
     - `patterns/flag/static_2d/001.nonfp.json`
     - `patterns/flag/static_2d/001.json` 
     - `patterns/xrage/asteroid/spatter.json`
-2. Generates a default module file located in `modules/custom.mod`
-    - Contains generic module load statements for cmake, openmpi, and gcc
-3. Populates the configuration file (`scripts/config.sh`) with reasonable defaults for a CTS-1 system
+2. Generates a default module file located in `modules/cpu.mod` and `moduules/gpu.mod`
+    - Contains generic module load statements for CPU and GPU dependencies
+3. Populates the CPU configuration file (`scripts/cpu_config.sh`) with reasonable defaults for a CTS-1 system
    - HOMEDIR is set to the directory this repository sits in
-   - MODULEFILE is set to `modules/custom.mod`
-   - SPATTER is set to path of the Spatter executable
-   - ranklist is set to sweep from 1-36 threads/ranks respectively for a CTS-1 type system
+   - MODULEFILE is set to `modules/cpu.mod`
+   - SPATTER is set to path of the Spatter CPU executable
+   - ranklist is set to sweep from 1-36 ranks respectively for a CTS-1 type system
    - boundarylist is set to reasonable defaults for scaling experiments (specifies the maximum value of a pattern index, limiting the size of the data array)
-   - (STRONG SCALING ONLY) sizelist is set to reasonable defaults for strong scaling experiments (specifies the size of the pattern to truncate at)
-4. Attempts to build Spatter with CMake, GCC, and MPI
-   - You will need GCC and MPI loaded into your environment (include them in your `modules/custom.mod`)
+   - sizelist is set to reasonable defaults for strong scaling experiments (specifies the size of the pattern to truncate at)
+4. Populates the GPU configuration file (`scripts/gpu_config.sh`) with reasonable defaults for single-GPU throughput experiments on a V100 or A100 system
+   - HOMEDIR is set to the directory this repository sits in
+   - MODULEFILE is set to `modules/gpu.mod`
+   - SPATTER is set to path of the Spatter GPU executable
+   - ranklist is set to a constant of 1 for 8 different runs (8 single-GPU runs)
+   - boundarylist is set to reasonable defaults for throughput experiments (specifies the maximum value of a pattern index, limiting the size of the data array)
+   - sizelist is set to reasonable defaults for throughput experiments (specifies the size of the pattern to truncate at)
+5. Attempts to build Spatter on CPU with CMake, GCC, and MPI and on GPU with CMake and nvcc
+   - You will need CMake, GCC, and MPI loaded into your environment for the CPU build (include them in your modules/cpu.mod)
+   - You will need CMake, cuda, and nvcc loaded into your environment for the GPU build (include them in your modules/gpu.mod)
+
 
 ### Running a Scaling Experiment
 This will perform a weak scaling experiment 
@@ -57,22 +73,21 @@ The `scripts/scaling.sh` script has the following options:
 - p: Problem name
 - f: Pattern name
 - n: User-defined run name (for saving results)
-- b: Boundary limit (option, default: off for weak scaling, on for strong scaling)
+- b: Toggle boundary limit (option, default: off for weak scaling, will be overridden to on for strong scaling)
 - c: Core binding (optional, default: off)
-- g: Plotting/Post-processing (optional, default: on)
-- r: Toggle MPI scaling (optional, default: off)
-- w: Toggle Weak/Strong Scaling (optional, default: off = strong scaling)
+- g: Toggle GPU (optional, default: off)
+- s: Toggle pattern size limit (optional, default: off for weak scaling, will be overridden to on for strong scaling)
+- t: Toggle throughput plot generation (optional, default: off)
+- w: Toggle weak/strong scaling (optional, default: off = strong scaling)
+- x: Toggle plotting/post-processing (optional, default: on)
 - h: Print usage message
 
 The Application name, Problem name, and Pattern name each correspond to subdirectories in this repository containing patterns stored as Spatter JSON input files.
 
 Current options for Application name, Problem name, and Pattern name are listed below:
 - Application name: flag, xrage
-- Problem name: static_2d, asteroid
+- Problem name: static\_2d, asteroid
 - Pattern name: 001 (for flag only), 001.fp (for flag only), 001.nonfp (for flag only), or spatter (for xrage only)
-
-
-If MPI scaling is enabled, full bandwidth results will be stored in the `mpi_\<ranks\>r_1t.txt` files. Additionally, the \<rank\>r subdirectories hold sorted bandwidth data for each rank from each pattern that was found in the Spatter JSON input file. These files will be labeled `\<ranks\>r/\<ranks\>r_1t_\<pattern_num\>p.txt`.
 
 
 #### Examples
@@ -80,13 +95,13 @@ If MPI scaling is enabled, full bandwidth results will be stored in the `mpi_\<r
 Weak-Scaling experiment with core-binding turned on and plotting enabled. Boundary limiting will be disabled by default. Results will be found in `spatter.weakscaling/CTS1/flag/static_2d/001` and Figures will be found in 'figures/CTS1/flag/static_2d/001`.
 
 ```
-bash scripts/scaling.sh -a flag -p static_2d -f 001 -n CTS1 -c -r -w
+bash scripts/scaling.sh -a flag -p static_2d -f 001 -n CTS1 -c -w
 ```
 
-Strong-Scaling experiment with plotting enabled. Boundary limiting using the values in boundarylist will be enabled by default. Results will be found in `spatter.strongscaling/A100/flag/static_2d/001` and Figures will be found in `figures/CTS1/flag/static_2d/001`.
+Throughput experiment with plotting enabled. Boundary limiting using the values in boundarylist and pattern truncating using the values in sizelist will be enabled by default. Results will be found in `spatter.strongscaling/A100/flag/static_2d/001` and Figures will be found in `figures/CTS1/flag/static_2d/001`.
 
 ```
-bash scripts/scaling.sh -a flag -p static_2d -f 001 -n A100 -r 
+bash scripts/scaling.sh -a flag -p static_2d -f 001 -n A100 -g -t
 ```
 
 The `scripts/mpirunscaling.sh` script has been provided if you need to use `mpirun` to launch jobs rather than `srun`.
@@ -95,7 +110,7 @@ The `scripts/mpirunscaling.sh` script has been provided if you need to use `mpir
 Simply update the `ranklist` variables in `scripts/config.sh` to the value of `( 1 )`
 
 ```
-bash scripts/scaling.sh -a flag -p static_2d -f 001 -n A100 -r
+bash scripts/scaling.sh -a flag -p static_2d -f 001 -n A100 -g
 ```
 
 
@@ -103,7 +118,7 @@ bash scripts/scaling.sh -a flag -p static_2d -f 001 -n A100 -r
 
 ### Editing the Module Environment
 
-Add your module load statements or path variables to the `modules/custom.mod` file. This file is loaded prior to performing any scaling experiments.
+Add your module load statements or path variables to the `modules/cpu.mod` or `modules/gpu.mod` file. The appropriate module file is loaded prior to performing any scaling experiments.
 
 For plotting (see `scripts/plot_mpi.py`), you will need a Python 3 installation with matplotlib and pandas
 
@@ -118,9 +133,15 @@ For a base GPU Module file:
 `cp modules/darwin_a100.mod modules/<name>.mod`
 
 Edit the modules required on your system
+
+
 ### Editing the Configuration
 Edit the configuration bash script
-`vim scripts/config.sh`
+
+```
+vim scripts/cpu_config.sh
+vim scripts/gpu_config.sh
+```
 
 - Change the HOMEDIR to the path to the root of this repository (absolute path).
 - Change the MODULEFILE to your new module file (absolute path).
