@@ -8,7 +8,7 @@ source ${MODULEFILE}
 
 cd spatter
 
-./configure/configure_omp_mpi_gnu
+cmake -DBACKEND=openmp -DCOMPILER=gnu -DUSE_MPI=1 -B build_omp_gnu_mpi -S .
 
 cd build_omp_mpi_gnu
 make -j
