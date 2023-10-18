@@ -26,7 +26,7 @@ echo "Generating Base Module Files"
 
 if [[ "${CPUBUILD}" -eq "1" ]]; then
 	echo "CPU Base Module File Located in modules/cpu.mod"
-	cp modules/darwin_skylake.mod modules/cpu.mod
+	cp modules/ats3.mod modules/cpu.mod
 fi
 
 if [[ "${GPUBUILD}" -eq "1" ]]; then
