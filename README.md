@@ -24,7 +24,7 @@ cd spatter
 ```
 
 ### Setup
-The setup script will initialize your CPU configuration file (`scripts/cpu_config.sh`) with CTS-1 defaults and the GPU configuration file (`scripts/gpu_config.sh`) with A100 defaults, and will build Spatter for CPU and GPU. See the [Spatter documentation](https://github.com/hpcgarage/spatter) and other build scripts (`scripts/build_cpu.sh` and `scripts/build_cuda.sh`) for further instructions for building with different compilers or for GPUs.
+The setup script will initialize your CPU configuration file (`scripts/cpu_config.sh`) with ATS-3 defaults and the GPU configuration file (`scripts/gpu_config.sh`) with A100 defaults, and will build Spatter for CPU and GPU. See the [Spatter documentation](https://github.com/hpcgarage/spatter) and other build scripts (`scripts/build_cpu.sh` and `scripts/build_cuda.sh`) for further instructions for building with different compilers or for GPUs.
 
 The `scripts/setup.sh` script has the following options:
 - c: Toggle CPU Build (default: off)
@@ -44,16 +44,17 @@ This setup script performs the following:
     - `patterns/flag/static_2d/001.nonfp.json`
     - `patterns/flag/static_2d/001.json` 
     - `patterns/xrage/asteroid/spatter.json`
-2. Generates a default module file located in `modules/cpu.mod` and `moduules/gpu.mod`
+2. Extracts patterns from `patterns/xrage/asteroid/spatter.json` to separate JSON files located at `patterns/xrage/asteroid/spatter{1-9}.json`
+3. Generates a default module file located in `modules/cpu.mod` and `moduules/gpu.mod`
     - Contains generic module load statements for CPU and GPU dependencies
-3. Populates the CPU configuration file (`scripts/cpu_config.sh`) with reasonable defaults for a CTS-1 system
+4. Populates the CPU configuration file (`scripts/cpu_config.sh`) with reasonable defaults for a ATS-3 system
    - HOMEDIR is set to the directory this repository sits in
    - MODULEFILE is set to `modules/cpu.mod`
    - SPATTER is set to path of the Spatter CPU executable
-   - ranklist is set to sweep from 1-36 ranks respectively for a CTS-1 type system
-   - boundarylist is set to reasonable defaults for scaling experiments (specifies the maximum value of a pattern index, limiting the size of the data array)
+   - ranklist is set to sweep from 1-112 ranks respectively for a ATS-3 type system
+   - boundarylist is set to reasonable defaults for strong scaling experiments (specifies the maximum value of a pattern index, limiting the size of the data array)
    - sizelist is set to reasonable defaults for strong scaling experiments (specifies the size of the pattern to truncate at)
-4. Populates the GPU configuration file (`scripts/gpu_config.sh`) with reasonable defaults for single-GPU throughput experiments on a V100 or A100 system
+5. Populates the GPU configuration file (`scripts/gpu_config.sh`) with reasonable defaults for single-GPU throughput experiments on a V100 or A100 system
    - HOMEDIR is set to the directory this repository sits in
    - MODULEFILE is set to `modules/gpu.mod`
    - SPATTER is set to path of the Spatter GPU executable
@@ -61,7 +62,7 @@ This setup script performs the following:
    - boundarylist is set to reasonable defaults for throughput experiments (specifies the maximum value of a pattern index, limiting the size of the data array)
    - sizelist is set to reasonable defaults for throughput experiments (specifies the size of the pattern to truncate at)
    - countlist is set to reasonable defaults to control the number of gathers/             scatters performed by an experiment. This is the parameter that is varied to perform       throughput experiments.
-5. Attempts to build Spatter on CPU with CMake, GCC, and MPI and on GPU with CMake and nvcc
+6. Attempts to build Spatter on CPU with CMake, GCC, and MPI and on GPU with CMake and nvcc
    - You will need CMake, GCC, and MPI loaded into your environment for the CPU build (include them in your `modules/cpu.mod`)
    - You will need CMake, cuda, and nvcc loaded into your environment for the GPU build (include them in your `modules/gpu.mod`)
 
@@ -88,15 +89,15 @@ The Application name, Problem name, and Pattern name each correspond to subdirec
 Current options for Application name, Problem name, and Pattern name are listed below:
 - Application name: flag, xrage
 - Problem name: static\_2d, asteroid
-- Pattern name: 001 (for flag only), 001.fp (for flag only), 001.nonfp (for flag only), or spatter (for xrage only)
+- Pattern name: 001 (for flag only), 001.fp (for flag only), 001.nonfp (for flag only), or spatter (for xrage only), spatter{1-9} (for xrage only)
 
 
 #### Examples
 
-Weak-Scaling experiment with core-binding turned on and plotting enabled. Boundary limiting will be disabled by default. Results will be found in `spatter.weakscaling/CTS1/flag/static_2d/001` and Figures will be found in 'figures/CTS1/flag/static_2d/001`.
+Weak-Scaling experiment with core-binding turned on and plotting enabled. Boundary limiting will be disabled by default. Results will be found in `spatter.weakscaling/ATS3/flag/static_2d/001` and Figures will be found in 'figures/ATS3/flag/static_2d/001`.
 
 ```
-bash scripts/scaling.sh -a flag -p static_2d -f 001 -n CTS1 -c -w
+bash scripts/scaling.sh -a flag -p static_2d -f 001 -n ATS3 -c -w
 ```
 
 Throughput experiment with plotting enabled. Boundary limiting using the values in boundarylist and pattern truncating using the values in sizelist will be enabled by default. Results will be found in `spatter.strongscaling/A100/flag/static_2d/001` and Figures will be found in `figures/CTS1/flag/static_2d/001`.
