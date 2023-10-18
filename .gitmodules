@@ -1,0 +1,4 @@
+[submodule "spatter"]
+	path = spatter
+	url = git@github.com:hpcgarage/spatter.git
+	branch = increase-pattern-size
