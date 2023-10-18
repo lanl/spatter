@@ -41,7 +41,26 @@ echo""
 echo "Untarring Patterns..."
 find ./patterns/flag -iname '*.tar.gz' -exec tar -xvzf {} \;
 find ./patterns/xrage -iname '*.tar.gz' -exec tar -xvzf {} \;
+for i in {1..9}
+do
+	n=$(( $i + 1 ))
+	sed -n "${i},${i}p;${n}q" spatter.json > spatter${i}.json
+done
+for i in {1..8}
+do
+	sed -Ei 's/\}\,/\}\]/g' spatter${i}.json
+done
+for i in {2..9}
+do
+	sed -Ei 's/\{/\[\{/g' spatter${i}.json
+done
+
 mv spatter.json patterns/xrage/asteroid/spatter.json
+for i in {1..9}
+do
+	mv spatter${i}.json patterns/xrage/asteroid/spatter${i}.json
+done
+
 echo ""
 
 if [[ "${CPUBUILD}" -eq "1" ]]; then
@@ -50,9 +69,9 @@ if [[ "${CPUBUILD}" -eq "1" ]]; then
 	sed -i "s|MODULEFILE=.*|MODULEFILE=$HOMEDIR\/modules\/cpu.mod|g" scripts/cpu_config.sh
 	sed -i "s|SPATTER=.*|SPATTER=$HOMEDIR\/spatter\/build_omp_mpi_gnu\/spatter|g" scripts/cpu_config.sh
 
-	sed -i "s|ranklist=.*|ranklist=\( 1 2 4 8 16 18 32 36 \)|g" scripts/cpu_config.sh
-	sed -i "s|boundarylist=.*|boundarylist=\( 81920 40960 20480 10240 5120 4550 2560 2275 \)|g" scripts/cpu_config.sh
-	sed -i "s|sizelist=.*|sizelist=\( 16384 8192 4096 2048 1024 910 512 455 \)|g" scripts/cpu_config.sh
+	sed -i "s|ranklist=.*|ranklist=\( 1 2 4 8 16 32 56 64 96 112 \)|g" scripts/cpu_config.sh
+	sed -i "s|boundarylist=.*|boundarylist=\( 81920 40960 20480 10240 5120 2560 1463 1280 853 731 \)|g" scripts/cpu_config.sh
+	sed -i "s|sizelist=.*|sizelist=\( 16384 8192 4096 2048 1024 512 293 256 171 146 \)|g" scripts/cpu_config.sh
 	echo ""
 
 	echo "Building Spatter on CPU..."
