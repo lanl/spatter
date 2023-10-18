@@ -41,19 +41,8 @@ echo""
 echo "Untarring Patterns..."
 find ./patterns/flag -iname '*.tar.gz' -exec tar -xvzf {} \;
 find ./patterns/xrage -iname '*.tar.gz' -exec tar -xvzf {} \;
-for i in {1..9}
-do
-	n=$(( $i + 1 ))
-	sed -n "${i},${i}p;${n}q" spatter.json > spatter${i}.json
-done
-for i in {1..8}
-do
-	sed -Ei 's/\}\,/\}\]/g' spatter${i}.json
-done
-for i in {2..9}
-do
-	sed -Ei 's/\{/\[\{/g' spatter${i}.json
-done
+
+python3 scripts/split.py
 
 mv spatter.json patterns/xrage/asteroid/spatter.json
 for i in {1..9}
