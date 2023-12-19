@@ -3,4 +3,6 @@
 #
 
 module load \
-gcc
+gcc \
+cmake \
+cray-mpich
