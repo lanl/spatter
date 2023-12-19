@@ -212,7 +212,7 @@ else
 		num_patterns="$((num_patterns-1))"
 
 		for pattern in $(seq 0 ${num_patterns}); do
-			cat mpi_${ranklist[i]}r${CFILE}.txt | grep "^${pattern} " | awk '{print $3}' > ${ranklist[i]}r/${ranklist[i]}r${CFILE}_${pattern}p.txt.tmp
+			cat mpi_${ranklist[i]}r${CFILE}.txt | grep "^${pattern} " | awk '{print $4}' > ${ranklist[i]}r/${ranklist[i]}r${CFILE}_${pattern}p.txt.tmp
 			cat ${ranklist[i]}r/${ranklist[i]}r${CFILE}_${pattern}p.txt.tmp | awk '{$1=$1};1' > ${ranklist[i]}r/${ranklist[i]}r${CFILE}_${pattern}p.txt
 			rm ${ranklist[i]}r/${ranklist[i]}r${CFILE}_${pattern}p.txt.tmp
 		done
