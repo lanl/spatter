@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 def generate_scaling(base, app, problem, func, nonfp, fp, arch, subdirs, pfile, gs_types):
-    df = pd.DataFrame(columns=['ranks', 'pattern', 'Total Bandwidth (MB/s)', 'Average Bandwidth per Rank (MB/s)', 'Type'])
+    df = pd.DataFrame(columns=['ranks', 'bytes', 'pattern', 'Total Bandwidth (MB/s)', 'Average Bandwidth per Rank (MB/s)', 'Type'])
 
     rank_set = set()
     pattern_set = set()
@@ -16,25 +16,29 @@ def generate_scaling(base, app, problem, func, nonfp, fp, arch, subdirs, pfile, 
         f_list = [os.path.join(d, x) for x in os.listdir(d) if os.path.isfile(os.path.join(d, x))]
     
         for f in f_list:
-            ranks = int(d.split('/')[-1][:-1])
-            pattern = int(f.split('/')[-1].split('_')[-1][:-5])
+            if "bytes" not in f:
+                fbytes = f + ".bytes"
+                size_bytes = pd.read_csv(fbytes, header=None)[0]
 
-            rank_set.add(ranks)
-            pattern_set.add(pattern)
+                ranks = int(d.split('/')[-1][:-1])
+                pattern = int(f.split('/')[-1].split('_')[-1][:-5])
+
+                rank_set.add(ranks)
+                pattern_set.add(pattern)
         
-            gs_type = gs_types[pattern]
+                gs_type = gs_types[pattern]
 
-            df_tmp = pd.read_csv(f, header=None)
-            df_tmp = df_tmp.astype(float)
-            row = [ranks, pattern, df_tmp[0].sum(), df_tmp[0].mean(), gs_type]
+                df_tmp = pd.read_csv(f, header=None)
+                df_tmp = df_tmp.astype(float)
+                row = [ranks, size_bytes, pattern, df_tmp[0].sum(), df_tmp[0].mean(), gs_type]
 
-            df.loc[len(df)] = row
+                df.loc[len(df)] = row
 
     return df, pattern_set
 
     
 def generate_throughput(base, app, problem, func, nonfp, fp, arch, subdirs, pfile, gs_types):
-    df = pd.DataFrame(columns=['ranks', 'count', 'pattern', 'Total Bandwidth (MB/s)', 'Average Bandwidth per Rank (MB/s)', 'Type'])
+    df = pd.DataFrame(columns=['ranks', 'bytes', 'count', 'pattern', 'Total Bandwidth (MB/s)', 'Average Bandwidth per Rank (MB/s)', 'Type'])
 
     ranks_list = []
     count_list = []
@@ -43,21 +47,25 @@ def generate_throughput(base, app, problem, func, nonfp, fp, arch, subdirs, pfil
         f_list = [os.path.join(d, x) for x in os.listdir(d) if os.path.isfile(os.path.join(d, x))]
     
         for f in f_list:
-            ranks = int(d.split('/')[-1][:-1]) 
-            count = int(f.split('/')[-1].split('_')[-2][:-1])
-            pattern = int(f.split('/')[-1].split('_')[-1][:-5])
+            if "bytes" not in f:
+                fbytes = f + ".bytes"
+                size_bytes = pd.read_csv(fbytes, header=None)[0].sum()
 
-            ranks_list.append(ranks)
-            count_list.append(count)
-            pattern_set.add(pattern)
+                ranks = int(d.split('/')[-1][:-1]) 
+                count = int(f.split('/')[-1].split('_')[-3][:-1])
+                pattern = int(f.split('/')[-1].split('_')[-1][:-5])
+
+                ranks_list.append(ranks)
+                count_list.append(count)
+                pattern_set.add(pattern)
         
-            gs_type = gs_types[pattern]
+                gs_type = gs_types[pattern]
 
-            df_tmp = pd.read_csv(f, header=None)
-            df_tmp = df_tmp.astype(float)
-            row = [ranks, count, pattern, df_tmp[0].sum(), df_tmp[0].mean(), gs_type]
+                df_tmp = pd.read_csv(f, header=None)
+                df_tmp = df_tmp.astype(float)
+                row = [ranks, size_bytes, count, pattern, df_tmp[0].sum(), df_tmp[0].mean(), gs_type]
 
-            df.loc[len(df)] = row
+                df.loc[len(df)] = row
 
     return df, pattern_set
 
@@ -67,14 +75,14 @@ def generate_plots(throughput, scaling, df, pattern_set, base, app, problem, fun
 
     with open(base + '/total.csv', 'w', newline='') as tfile:
         totalwriter = csv.writer(tfile)
-        for count, p in enumerate(pattern_set):
+        for pid, p in enumerate(pattern_set):
             sub_df = df.loc[df['pattern'] == p]
             xvals = list(sub_df[key])
             totals = list(sub_df['Total Bandwidth (MB/s)'])
 
             xvals, totals = zip(*sorted(zip(xvals, totals)))
 
-            if count == 0:
+            if pid == 0:
                 totalwriter.writerow(['Pattern'] + list(xvals))
                 tfile.flush()
 
@@ -187,7 +195,7 @@ def main():
     else:
         print("Generating Throughput Plots")
         tdf, pattern_set = generate_throughput(base, app, problem, func, nonfp, fp, arch, subdirs, pfile, gs_types)
-        generate_plots(throughput, scaling, tdf, pattern_set, base, app, problem, func, nonfp, fp, arch, 'count', '# of Gather/Scatter Ops', 'Throughput', '')
+        generate_plots(throughput, scaling, tdf, pattern_set, base, app, problem, func, nonfp, fp, arch, 'bytes', '# of Bytes Transferred', 'Throughput', '')
 
 if __name__ == "__main__":
     main()
