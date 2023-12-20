@@ -104,7 +104,7 @@ bash scripts/scaling.sh -a flag -p static_2d -f 001 -n ATS3 -c -w
 Throughput experiment with plotting enabled. Boundary limiting using the values in boundarylist and pattern truncating using the values in sizelist will be enabled by default. Results will be found in `spatter.strongscaling/A100/flag/static_2d/001` and Figures will be found in `figures/CTS1/flag/static_2d/001`.
 
 ```
-bash scripts/scaling.sh -a flag -p static_2d -f 001 -n A100 -g -t
+bash scripts/scaling.sh -a xrage -p static_2d -f 001 -n A100 -g -s -t
 ```
 
 The `scripts/mpirunscaling.sh` script has been provided if you need to use `mpirun` to launch jobs rather than `srun`.
