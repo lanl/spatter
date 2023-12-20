@@ -73,12 +73,10 @@ if [[ "${GPUBUILD}" -eq "1" ]]; then
 	sed -i "s|MODULEFILE=.*|MODULEFILE=$HOMEDIR\/modules\/gpu.mod|g" scripts/gpu_config.sh
 	sed -i "s|SPATTER=.*|SPATTER=$HOMEDIR\/spatter\/build_cuda\/spatter|g" scripts/gpu_config.sh
 
-	sed -i "s|ranklist=.*|ranklist=\( 1 1 1 1 1 1 1 1 \)|g" scripts/gpu_config.sh
-	#sed -i "s|boundarylist=.*|boundarylist=\( 81920 40960 20480 10240 5120 2560 1280 640 \)|g" scripts/gpu_config.sh
-	#sed -i "s|sizelist=.*|sizelist=\( 4096 2048 1024 512 256 128 64 32 \)|g" scripts/gpu_config.sh
-	sed -i "s|boundarylist=.*|boundarylist=\( 81920 81920 81920 81920 81920 81920 81920 81920 \)|g" scripts/gpu_config.sh
-	sed -i "s|sizelist=.*|sizelist=\( 4096 4096 4096 4096 4096 4096 4096 4096 \)|g" scripts/gpu_config.sh
-	sed -i "s|countlist=.*|countlist=\( 65536 32768 16384 8192 4096 2048 1024 512 \)|g" scripts/gpu_config.sh	
+	sed -i "s|ranklist=.*|ranklist=\( 1 1 1 1 1 1 1 1 1 1 1 1\)|g" scripts/gpu_config.sh
+	sed -i "s|boundarylist=.*|boundarylist=\( 81920 81920 81920 81920 81920 81920 81920 81920 81920 81920 81920 81920 \)|g" scripts/gpu_config.sh
+	sed -i "s|sizelist=.*|sizelist=\( 524288 1048576 2097152 4194304 8388608 8388608 8388608 8388608 8388608 8388608 8388608 8388608 \)|g" scripts/gpu_config.sh
+	sed -i "s|countlist=.*|countlist=\( 1 1 1 1 1 2 4 8 16 32 64 128 \)|g" scripts/gpu_config.sh	
 
 	echo ""
 

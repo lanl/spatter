@@ -129,7 +129,8 @@ else
 	cd ${SCALINGDIR}/${RUNNAME}/${APP}/${PROBLEM}/${PATTERN}
 
 	for i in ${!ranklist[*]}; do
-		CFILE=""
+		CFILE="_c1"
+		SFILE="_s0"
 
 		# Core Binding
 		if [[ "${BINDING}" -eq "1" ]]; then	
@@ -143,6 +144,7 @@ else
 			# Strong Scaling
 			if [[ "${WEAKSCALING}" -ne "1" ]]; then
 				sed -Ei 's/\}/\, "pattern-size": '${sizelist[i]}'\}/g' ${JSON}
+				SFILE="_${sizelist[i]}s"
 
 				if [[ "${GPU}" -eq "1" ]]; then
 					CFILE="_${countlist[i]}c"
@@ -153,6 +155,7 @@ else
 			# Weak Scaling
 			else
 				if [[ "${PSIZE}" -eq "1" ]]; then
+					SFILE="_${sizelist[i]}s"
 					sed -Ei 's/\}/\, "pattern-size": '${sizelist[i]}'\}/g' ${JSON}
 				fi
 				
@@ -176,6 +179,7 @@ else
 
 			# Strong Scaling
 			if [[ "${WEAKSCALING}" -ne "1" ]]; then
+				SFILE="_${sizelist[i]}s"
 				sed -Ei 's/\}/\, "pattern-size": '${sizelist[i]}'\}/g' ${JSON}
 
 				if [[ "${GPU}" -eq "1" ]]; then
@@ -187,6 +191,7 @@ else
 			# Weak Scaling
 			else	
 				if [[ "${PSIZE}" -eq "1" ]]; then
+					SFILE="_${sizelist[i]}s"
 					sed -Ei 's/\}/\, "pattern-size": '${sizelist[i]}'\}/g' ${JSON}
 				fi
 
@@ -202,7 +207,7 @@ else
 		fi
 
 		echo ${CMD}
-		${CMD} > mpi_${ranklist[i]}r${CFILE}.txt
+		${CMD} > mpi_${ranklist[i]}r${CFILE}${SFILE}.txt
 
 		mv ${JSON}.orig ${JSON}
 
@@ -212,9 +217,13 @@ else
 		num_patterns="$((num_patterns-1))"
 
 		for pattern in $(seq 0 ${num_patterns}); do
-			cat mpi_${ranklist[i]}r${CFILE}.txt | grep "^${pattern} " | awk '{print $3}' > ${ranklist[i]}r/${ranklist[i]}r${CFILE}_${pattern}p.txt.tmp
-			cat ${ranklist[i]}r/${ranklist[i]}r${CFILE}_${pattern}p.txt.tmp | awk '{$1=$1};1' > ${ranklist[i]}r/${ranklist[i]}r${CFILE}_${pattern}p.txt
-			rm ${ranklist[i]}r/${ranklist[i]}r${CFILE}_${pattern}p.txt.tmp
+			cat mpi_${ranklist[i]}r${CFILE}${SFILE}.txt | grep "^${pattern} " | awk '{print $2}' > ${ranklist[i]}r/${ranklist[i]}r${CFILE}${SFILE}_${pattern}p.txt.tmp.bytes
+			cat ${ranklist[i]}r/${ranklist[i]}r${CFILE}${SFILE}_${pattern}p.txt.tmp.bytes | awk '{$1=$1};1' > ${ranklist[i]}r/${ranklist[i]}r${CFILE}${SFILE}_${pattern}p.txt.bytes
+			rm ${ranklist[i]}r/${ranklist[i]}r${CFILE}${SFILE}_${pattern}p.txt.tmp.bytes
+
+			cat mpi_${ranklist[i]}r${CFILE}${SFILE}.txt | grep "^${pattern} " | awk '{print $4}' > ${ranklist[i]}r/${ranklist[i]}r${CFILE}${SFILE}_${pattern}p.txt.tmp
+			cat ${ranklist[i]}r/${ranklist[i]}r${CFILE}${SFILE}_${pattern}p.txt.tmp | awk '{$1=$1};1' > ${ranklist[i]}r/${ranklist[i]}r${CFILE}${SFILE}_${pattern}p.txt
+			rm ${ranklist[i]}r/${ranklist[i]}r${CFILE}${SFILE}_${pattern}p.txt.tmp
 		done
 	done
 
