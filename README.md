@@ -8,6 +8,7 @@ This repository contains a few scripts and gather/scatter patterns of LANL codes
 
 1. Build Spatter with MPI support for scaling experiments.
 2. Performing on-node weak scaling experiments with Spatter given patterns from LANL codes
+3. Performing on-node GPU throughput experiments with Spatter given patterns from LANL codes
 
 ## Usage
 

@@ -38,7 +38,7 @@ def generate_scaling(base, app, problem, func, nonfp, fp, arch, subdirs, pfile, 
 
     
 def generate_throughput(base, app, problem, func, nonfp, fp, arch, subdirs, pfile, gs_types):
-    df = pd.DataFrame(columns=['ranks', 'bytes', 'count', 'pattern', 'Total Bandwidth (MB/s)', 'Average Bandwidth per Rank (MB/s)', 'Type'])
+    df = pd.DataFrame(columns=['ranks', 'megabytes', 'count', 'pattern', 'Total Bandwidth (MB/s)', 'Average Bandwidth per Rank (MB/s)', 'Type'])
 
     ranks_list = []
     count_list = []
@@ -49,7 +49,7 @@ def generate_throughput(base, app, problem, func, nonfp, fp, arch, subdirs, pfil
         for f in f_list:
             if "bytes" not in f:
                 fbytes = f + ".bytes"
-                size_bytes = pd.read_csv(fbytes, header=None)[0].sum()
+                size_megabytes = pd.read_csv(fbytes, header=None)[0].sum() / 1000000.0
 
                 ranks = int(d.split('/')[-1][:-1]) 
                 count = int(f.split('/')[-1].split('_')[-3][:-1])
@@ -63,7 +63,7 @@ def generate_throughput(base, app, problem, func, nonfp, fp, arch, subdirs, pfil
 
                 df_tmp = pd.read_csv(f, header=None)
                 df_tmp = df_tmp.astype(float)
-                row = [ranks, size_bytes, count, pattern, df_tmp[0].sum(), df_tmp[0].mean(), gs_type]
+                row = [ranks, size_megabytes, count, pattern, df_tmp[0].sum(), df_tmp[0].mean(), gs_type]
 
                 df.loc[len(df)] = row
 
@@ -195,7 +195,7 @@ def main():
     else:
         print("Generating Throughput Plots")
         tdf, pattern_set = generate_throughput(base, app, problem, func, nonfp, fp, arch, subdirs, pfile, gs_types)
-        generate_plots(throughput, scaling, tdf, pattern_set, base, app, problem, func, nonfp, fp, arch, 'bytes', '# of Bytes Transferred', 'Throughput', '')
+        generate_plots(throughput, scaling, tdf, pattern_set, base, app, problem, func, nonfp, fp, arch, 'megabytes', 'MB Transferred', 'Throughput', '')
 
 if __name__ == "__main__":
     main()
