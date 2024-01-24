@@ -94,13 +94,19 @@ Current options for Application name, Problem name, and Pattern name are listed 
 
 #### Examples
 
-Weak-Scaling experiment with core-binding turned on and plotting enabled. Boundary limiting will be disabled by default. Results will be found in `spatter.weakscaling/ATS3/flag/static_2d/001` and Figures will be found in 'figures/ATS3/flag/static_2d/001`.
+Weak-Scaling experiment (`-w`) on the CPU with core-binding (`-c`) turned on and plotting enabled (on by default). Results will be found in `spatter.weakscaling/ATS3/flag/static_2d/001` and Figures will be found in `figures/spatter.weakscaling/ATS3/flag/static_2d/001`.
 
 ```
 bash scripts/scaling.sh -a flag -p static_2d -f 001 -n ATS3 -c -w
 ```
 
-Throughput experiment with plotting enabled. Boundary limiting using the values in boundarylist and pattern truncating using the values in sizelist will be enabled by default. Results will be found in `spatter.strongscaling/A100/flag/static_2d/001` and Figures will be found in `figures/CTS1/flag/static_2d/001`.
+Strong-Scaling experiment on the CPU with core-binding (`-c`) turned on and plotting enabled (on by default). Results will be found in `spatter.strongscaling/ATS3/flag/static_2d/001` and Figures will be found in `figures/spatter.strongscaling/ATS3/flag/static_2d/001`.
+
+```
+bash scripts/scaling.sh -a flag -p static_2d -f 001 -n ATS3 -c
+```
+
+Throughput experiment on the GPU (`-g`) with throughput plotting (`-t`), pattern truncating using the values in sizelist (`-s`), and multiple scatters/gathers using the values in countlist (`-r`). Results will be found in `spatter.strongscaling/A100/flag/static_2d/001` and Figures will be found in `figures/CTS1/flag/static_2d/001`.
 
 ```
 bash scripts/scaling.sh -a flag -p static_2d -f 001 -n A100 -g -s -r -t
@@ -129,7 +135,7 @@ For GPU builds (CUDA), you need CMake, nvcc, gcc, and MPI
 
 #### Copy an existing Module Environment File
 For a base CPU Module file:
-`cp modules/darwin_skylake.mod modules/<name>.mod`
+`cp modules/ats3.mod modules/<name>.mod`
 
 For a base GPU Module file:
 `cp modules/darwin_a100.mod modules/<name>.mod`
@@ -149,7 +155,8 @@ vim scripts/gpu_config.sh
 - Change the MODULEFILE to your new module file (absolute path).
 - You may leave SPATTER unchanged unless you have another Spatter binary on your system. If so, you may update this variable to point to you Spatter binary.
 - Change ranklist as appropriate for your system. This sets the number of MPI ranks Spatter will scale through.
-- (STRONG SCALING ONLY) Change sizelist as appropriate for strong scaling experiments. This defines the pattern length to truncate at as we scale. The defaults provided should work for the provided patterns. Only change if you know what you are doing.
+- Change sizelist as appropriate for strong scaling experiments. This defines the pattern length to truncate at as we scale. The defaults provided should work for the provided patterns. Only change if you know what you are doing.
+- Change countlist as appropriate for strong scaling experiments. This defines the number of scatters/gathers to perform, each shifted by a default delta of 8. See hpcgarage/spatter for further documentation on the count and delta parameters.
 
 ### Building Spatter
 
