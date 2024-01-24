@@ -6,10 +6,10 @@ usage() {
 		-p : Specify the name of the input problem (see available problems in the application sub-directory)
 		-f : Specify the base name of the input JSON file containing the gather/scatter pattern (see available patterns in the input problem subdirectory)
 		-n : Specify the test name you would like to use to identify this run (used to appropriately save data)
-		-b : Optional, toggle boundary limit on pattern with boundarylist (default: off for weak scaling, will be overrridden to on for strong scaling)
 		-c : Optional, toggle core binding (default: off)
 		-g : Optional, toggle gpu (default: off/cpu)
-		-s : Optional, toggle pattern size limit on pattern with sizelist (default: off for weak scaling, will be overridden to on for strong scaling)
+		-r : Optional, toggle count parameter on pattern with countlist (default: off)
+		-s : Optional, toggle pattern size limit on pattern with sizelist (default: off)
 		-t : Optional, toggle throughput plot generation (optional, default: off)
 		-w : Optional, enable weak scaling (default: off, strong scaling)
 		-x : Optional, toggle plotting/post-processing. Requires python3 environment with pandas, matplotlib (default: on)"
@@ -22,15 +22,13 @@ else
         WEAKSCALING=0
 	PLOT=1
 	BINDING=0
-	BOUNDARY=0
+	COUNT=0
 	PSIZE=0
 	GPU=0
 	THROUGHPUT=0
-	while getopts "a:f:p:n:bcgstwx" opt; do
+	while getopts "a:f:p:n:cgrstwx" opt; do
 		case $opt in 
 			a) APP=$OPTARG
-			;;
-			b) BOUNDARY=1
 			;;
 			f) PATTERN=$OPTARG
 			;;
@@ -41,6 +39,8 @@ else
 			c) BINDING=1
 			;;
 			g) GPU=1
+			;;
+			r) COUNT=1
 			;;
 			s) PSIZE=1
 			;;
@@ -76,37 +76,27 @@ else
 	fi
 	echo "THROUGHPUT PLOTS: ${THROUGHPUT}"
 
-	if [[ "${WEAKSCALING}" -ne "1" ]]; then
-		echo "Strong Scaling run, turning on boundary size and pattern size"
-		BOUNDARY=1
-		PSIZE=1
-	fi
-
         if [[ "${WEAKSCALING}" -eq "1" ]]; then
                	echo "Weak Scaling"	
-		echo "BOUNDARY: ${BOUNDARY}"
-		if [[ "${BOUNDARY}" -eq "1" ]]; then
-			echo "BOUNDARY LIST: ${boundarylist[*]}"
-		fi
-		echo "PATTERN SIZE: ${PSIZE}"
-		if [[ "${PSIZE}" -eq "1" ]]; then
-			echo "PATTERN SIZE LIST: ${sizelist[*]}"
-		fi
 		SCALINGDIR="spatter.weakscaling"
 	else
                	echo "Strong Scaling"
-		echo "BOUNDARY: ${BOUNDARY}"
-		echo "BOUNDARY LIST: ${boundarylist[*]}"
-		echo "PATTERN SIZE: ${PSIZE}"
-		echo "PATTERN SIZE LIST: ${sizelist[*]}"
 		SCALINGDIR="spatter.strongscaling"
 	fi
 
 	if [[ "${GPU}" -eq "1" ]]; then
 		echo "GPU Run, turning off core binding"
 		BINDING=0
-		echo "GPU Run, Enabling countlist"
+	fi
+
+	echo "COUNT: ${COUNT}"
+	if [[ "${COUNT}" -eq "1" ]]; then
 		echo "COUNT LIST: ${countlist[*]}"
+	fi
+
+	echo "PATTERN SIZE: ${PSIZE}"
+	if [[ "${PSIZE}" -eq "1" ]]; then
+		echo "PATTERN SIZE LIST: ${sizelist[*]}"
 	fi
 
 	echo "RANK LIST: ${ranklist[*]}"
@@ -129,80 +119,42 @@ else
 	cd ${SCALINGDIR}/${RUNNAME}/${APP}/${PROBLEM}/${PATTERN}
 
 	for i in ${!ranklist[*]}; do
+
+		cp ${JSON} ${JSON}.orig
+
 		CFILE="_c1"
 		SFILE="_s0"
+
+		if [[ "${COUNT}" -eq "1" ]]; then
+			CFILE="_${countlist[i]}c"
+			sed -Ei 's/"count":1/"count": '${countlist[i]}'/g' ${JSON}
+		fi
+
+		if [[ "${PSIZE}" -eq "1" ]]; then
+			SFILE="_${sizelist[i]}s"
+			sed -Ei 's/\}/\, "pattern-size": '${sizelist[i]}'\}/g' ${JSON}
+		fi
+
+		if [[ "${GPU}" -eq "1" ]]; then
+			sed -Ei 's/\}/\, "local-work-size": 1024\}/g' ${JSON}
+		fi
 
 		# Core Binding
 		if [[ "${BINDING}" -eq "1" ]]; then	
 			CMD="srun -n ${ranklist[i]} --cpu-bind=core ${SPATTER} -pFILE=${JSON} -q3"
-			cp ${JSON} ${JSON}.orig
 		
-			if [[ "${GPU}" -eq "1" ]]; then
-				sed -Ei 's/\}/\, "local-work-size": 1024\}/g' ${JSON}
-			fi
-	
 			# Strong Scaling
 			if [[ "${WEAKSCALING}" -ne "1" ]]; then
-				sed -Ei 's/\}/\, "pattern-size": '${sizelist[i]}'\}/g' ${JSON}
-				SFILE="_${sizelist[i]}s"
-
-				if [[ "${GPU}" -eq "1" ]]; then
-					CFILE="_${countlist[i]}c"
-					sed -Ei 's/"count":1/"count": '${countlist[i]}'/g' ${JSON}
-				fi
-
-				sed -Ei 's/\}/\, "boundary": '${boundarylist[i]}'\}/g' ${JSON}
-			# Weak Scaling
-			else
-				if [[ "${PSIZE}" -eq "1" ]]; then
-					SFILE="_${sizelist[i]}s"
-					sed -Ei 's/\}/\, "pattern-size": '${sizelist[i]}'\}/g' ${JSON}
-				fi
-				
-				if [[ "${GPU}" -eq "1" ]]; then
-					CFILE="_${countlist[i]}c"
-					sed -Ei 's/"count":1/"count": '${countlist[i]}'/g' ${JSON}
-				fi
-				
-				if [[ "${BOUNDARY}" -eq "1" ]]; then
-					sed -Ei 's/\}/\, "boundary": '${boundarylist[i]}'\}/g' ${JSON}
-				fi
+ 				sed -Ei 's/\}/\, "strong-scale": 1\}/g' ${JSON}
 			fi
+
 		# No Core Binding
 		else
 			CMD="srun -n ${ranklist[i]} ${SPATTER} -pFILE=${JSON} -q3"
-			cp ${JSON} ${JSON}.orig
-			
-			if [[ "${GPU}" -eq "1" ]]; then
-				sed -Ei 's/\}/\, "local-work-size": 1024\}/g' ${JSON}
-			fi
 
 			# Strong Scaling
 			if [[ "${WEAKSCALING}" -ne "1" ]]; then
-				SFILE="_${sizelist[i]}s"
-				sed -Ei 's/\}/\, "pattern-size": '${sizelist[i]}'\}/g' ${JSON}
-
-				if [[ "${GPU}" -eq "1" ]]; then
-					CFILE="_${countlist[i]}c"
-					sed -Ei 's/"count":1/"count": '${countlist[i]}'/g' ${JSON}
-				fi
-
-				sed -Ei 's/\}/\, "boundary": '${boundarylist[i]}'\}/g' ${JSON}
-			# Weak Scaling
-			else	
-				if [[ "${PSIZE}" -eq "1" ]]; then
-					SFILE="_${sizelist[i]}s"
-					sed -Ei 's/\}/\, "pattern-size": '${sizelist[i]}'\}/g' ${JSON}
-				fi
-
-				if [[ "${GPU}" -eq "1" ]]; then
-					CFILE="_${countlist[i]}c"
-					sed -Ei 's/"count":1/"count": '${countlist[i]}'/g' ${JSON}
-				fi
-
-				if [[ "${BOUNDARY}" -eq "1" ]]; then
-					sed -Ei 's/\}/\, "boundary": '${boundarylist[i]}'\}/g' ${JSON}
-				fi
+				sed -Ei 's/\}/\, "strong-scale": 1\}/g' ${JSON}
 			fi
 		fi
 
