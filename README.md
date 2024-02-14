@@ -53,16 +53,15 @@ This setup script performs the following:
    - MODULEFILE is set to `modules/cpu.mod`
    - SPATTER is set to path of the Spatter CPU executable
    - ranklist is set to sweep from 1-112 ranks respectively for a ATS-3 type system
-   - boundarylist is set to reasonable defaults for strong scaling experiments (specifies the maximum value of a pattern index, limiting the size of the data array)
    - sizelist is set to reasonable defaults for strong scaling experiments (specifies the size of the pattern to truncate at)
+   - countlist is set to defaults of 1.
 5. Populates the GPU configuration file (`scripts/gpu_config.sh`) with reasonable defaults for single-GPU throughput experiments on a V100 or A100 system
    - HOMEDIR is set to the directory this repository sits in
    - MODULEFILE is set to `modules/gpu.mod`
    - SPATTER is set to path of the Spatter GPU executable
    - ranklist is set to a constant of 1 for 8 different runs (8 single-GPU runs)
-   - boundarylist is set to reasonable defaults for throughput experiments (specifies the maximum value of a pattern index, limiting the size of the data array)
    - sizelist is set to reasonable defaults for throughput experiments (specifies the size of the pattern to truncate at)
-   - countlist is set to reasonable defaults to control the number of gathers/             scatters performed by an experiment. This is the parameter that is varied to perform       throughput experiments.
+   - countlist is set to reasonable defaults to control the number of gathers/scatters performed by an experiment. This is the parameter that is varied to perform throughput experiments.
 6. Attempts to build Spatter on CPU with CMake, GCC, and MPI and on GPU with CMake and nvcc
    - You will need CMake, GCC, and MPI loaded into your environment for the CPU build (include them in your `modules/cpu.mod`)
    - You will need CMake, cuda, and nvcc loaded into your environment for the GPU build (include them in your `modules/gpu.mod`)
@@ -76,9 +75,9 @@ The `scripts/scaling.sh` script has the following options:
 - p: Problem name
 - f: Pattern name
 - n: User-defined run name (for saving results)
-- b: Toggle boundary limit (option, default: off for weak scaling, will be overridden to on for strong scaling)
 - c: Core binding (optional, default: off)
 - g: Toggle GPU (optional, default: off)
+- r: Toggle count parameter on pattern with countlist (default: off)
 - s: Toggle pattern size limit (optional, default: off for weak scaling, will be overridden to on for strong scaling)
 - t: Toggle throughput plot generation (optional, default: off)
 - w: Toggle weak/strong scaling (optional, default: off = strong scaling)
@@ -95,16 +94,22 @@ Current options for Application name, Problem name, and Pattern name are listed 
 
 #### Examples
 
-Weak-Scaling experiment with core-binding turned on and plotting enabled. Boundary limiting will be disabled by default. Results will be found in `spatter.weakscaling/ATS3/flag/static_2d/001` and Figures will be found in 'figures/ATS3/flag/static_2d/001`.
+Weak-Scaling experiment (`-w`) on the CPU with core-binding (`-c`) turned on and plotting enabled (on by default). Results will be found in `spatter.weakscaling/ATS3/flag/static_2d/001` and Figures will be found in `figures/spatter.weakscaling/ATS3/flag/static_2d/001`.
 
 ```
 bash scripts/scaling.sh -a flag -p static_2d -f 001 -n ATS3 -c -w
 ```
 
-Throughput experiment with plotting enabled. Boundary limiting using the values in boundarylist and pattern truncating using the values in sizelist will be enabled by default. Results will be found in `spatter.strongscaling/A100/flag/static_2d/001` and Figures will be found in `figures/CTS1/flag/static_2d/001`.
+Strong-Scaling experiment on the CPU with core-binding (`-c`) turned on and plotting enabled (on by default). Results will be found in `spatter.strongscaling/ATS3/flag/static_2d/001` and Figures will be found in `figures/spatter.strongscaling/ATS3/flag/static_2d/001`.
 
 ```
-bash scripts/scaling.sh -a xrage -p static_2d -f 001 -n A100 -g -s -t
+bash scripts/scaling.sh -a flag -p static_2d -f 001 -n ATS3 -c
+```
+
+Throughput experiment on the GPU (`-g`) with throughput plotting (`-t`), pattern truncating using the values in sizelist (`-s`), and multiple scatters/gathers using the values in countlist (`-r`). Results will be found in `spatter.strongscaling/H100/flag/static_2d/001` and Figures will be found in `figures/spatter.strongscaling/H100/flag/static_2d/001`.
+
+```
+bash scripts/scaling.sh -a flag -p static_2d -f 001 -n H100 -g -s -r -t
 ```
 
 The `scripts/mpirunscaling.sh` script has been provided if you need to use `mpirun` to launch jobs rather than `srun`.
@@ -113,7 +118,7 @@ The `scripts/mpirunscaling.sh` script has been provided if you need to use `mpir
 Simply update the `ranklist` variables in `scripts/config.sh` to the value of `( 1 )`
 
 ```
-bash scripts/scaling.sh -a flag -p static_2d -f 001 -n A100 -g
+bash scripts/scaling.sh -a flag -p static_2d -f 001 -n H100 -g
 ```
 
 
@@ -130,7 +135,7 @@ For GPU builds (CUDA), you need CMake, nvcc, gcc, and MPI
 
 #### Copy an existing Module Environment File
 For a base CPU Module file:
-`cp modules/darwin_skylake.mod modules/<name>.mod`
+`cp modules/ats3.mod modules/<name>.mod`
 
 For a base GPU Module file:
 `cp modules/darwin_a100.mod modules/<name>.mod`
@@ -150,8 +155,8 @@ vim scripts/gpu_config.sh
 - Change the MODULEFILE to your new module file (absolute path).
 - You may leave SPATTER unchanged unless you have another Spatter binary on your system. If so, you may update this variable to point to you Spatter binary.
 - Change ranklist as appropriate for your system. This sets the number of MPI ranks Spatter will scale through.
-- Change the boundarylist as appropriate for scaling experiments. This defines the largest index that can exist in the pattern array. Any indices larger will be truncated by x % boundary. This in turn, limits the size of the data array, since it has extent max(pattern). Only change if you know what you are doing.
-- (STRONG SCALING ONLY) Change sizelist as appropriate for strong scaling experiments. This defines the pattern length to truncate at as we scale. The defaults provided should work for the provided patterns. Only change if you know what you are doing.
+- Change sizelist as appropriate for strong scaling experiments. This defines the pattern length to truncate at as we scale. The defaults provided should work for the provided patterns. Only change if you know what you are doing.
+- Change countlist as appropriate for strong scaling experiments. This defines the number of scatters/gathers to perform, each shifted by a default delta of 8. See hpcgarage/spatter for further documentation on the count and delta parameters.
 
 ### Building Spatter
 
