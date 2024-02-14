@@ -106,10 +106,10 @@ Strong-Scaling experiment on the CPU with core-binding (`-c`) turned on and plot
 bash scripts/scaling.sh -a flag -p static_2d -f 001 -n ATS3 -c
 ```
 
-Throughput experiment on the GPU (`-g`) with throughput plotting (`-t`), pattern truncating using the values in sizelist (`-s`), and multiple scatters/gathers using the values in countlist (`-r`). Results will be found in `spatter.strongscaling/A100/flag/static_2d/001` and Figures will be found in `figures/CTS1/flag/static_2d/001`.
+Throughput experiment on the GPU (`-g`) with throughput plotting (`-t`), pattern truncating using the values in sizelist (`-s`), and multiple scatters/gathers using the values in countlist (`-r`). Results will be found in `spatter.strongscaling/H100/flag/static_2d/001` and Figures will be found in `figures/spatter.strongscaling/H100/flag/static_2d/001`.
 
 ```
-bash scripts/scaling.sh -a flag -p static_2d -f 001 -n A100 -g -s -r -t
+bash scripts/scaling.sh -a flag -p static_2d -f 001 -n H100 -g -s -r -t
 ```
 
 The `scripts/mpirunscaling.sh` script has been provided if you need to use `mpirun` to launch jobs rather than `srun`.
@@ -118,7 +118,7 @@ The `scripts/mpirunscaling.sh` script has been provided if you need to use `mpir
 Simply update the `ranklist` variables in `scripts/config.sh` to the value of `( 1 )`
 
 ```
-bash scripts/scaling.sh -a flag -p static_2d -f 001 -n A100 -g
+bash scripts/scaling.sh -a flag -p static_2d -f 001 -n H100 -g
 ```
 
 
