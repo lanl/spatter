@@ -8,6 +8,7 @@ usage() {
 		-n : Specify the test name you would like to use to identify this run (used to appropriately save data)
 		-c : Optional, toggle core binding (default: off)
 		-g : Optional, toggle gpu (default: off/cpu)
+                -m : Optional, toggle atomics (default: off/no atomics)
 		-r : Optional, toggle count parameter on pattern with countlist (default: off)
 		-s : Optional, toggle pattern size limit on pattern with sizelist (default: off)
 		-t : Optional, toggle throughput plot generation (optional, default: off)
@@ -21,6 +22,7 @@ else
         SCALINGDIR="spatter.scaling"
         WEAKSCALING=0
 	PLOT=1
+        ATOMIC=0
 	BINDING=0
 	COUNT=0
 	PSIZE=0
@@ -40,6 +42,8 @@ else
 			;;
 			g) GPU=1
 			;;
+                        m) ATOMIC=1
+                        ;;
 			r) COUNT=1
 			;;
 			s) PSIZE=1
@@ -69,6 +73,7 @@ else
 	echo "PATTERN: ${PATTERN}"
 	echo "RUNNAME: ${RUNNAME}"
 	echo "GPU: ${GPU}"
+        echo "ATOMIC: ${ATOMIC}"
 	echo "PLOTTING: ${PLOT}"
 	if [[ "${PLOT}" -ne "1" ]]; then
 		echo "Plotting disabled, turning off throughput plots"
@@ -142,7 +147,12 @@ else
 		# Core Binding
 		if [[ "${BINDING}" -eq "1" ]]; then	
 			CMD="srun -n ${ranklist[i]} --cpu-bind=core ${SPATTER} -pFILE=${JSON} -q3"
-		
+
+			# Atomics
+			if [[ "${ATOMIC}" -ne "0" ]]; then
+ 				sed -Ei 's/\}/\, "atomic-writes": 1\}/g' ${JSON}
+			fi
+	
 			# Strong Scaling
 			if [[ "${WEAKSCALING}" -ne "1" ]]; then
  				sed -Ei 's/\}/\, "strong-scale": 1\}/g' ${JSON}
@@ -152,6 +162,11 @@ else
 		else
 			CMD="srun -n ${ranklist[i]} ${SPATTER} -pFILE=${JSON} -q3"
 
+			# Atomics
+			if [[ "${ATOMIC}" -ne "0" ]]; then
+ 				sed -Ei 's/\}/\, "atomic-writes": 1\}/g' ${JSON}
+			fi
+	
 			# Strong Scaling
 			if [[ "${WEAKSCALING}" -ne "1" ]]; then
 				sed -Ei 's/\}/\, "strong-scale": 1\}/g' ${JSON}
