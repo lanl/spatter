@@ -77,6 +77,7 @@ The `scripts/scaling.sh` script has the following options:
 - n: User-defined run name (for saving results)
 - c: Core binding (optional, default: off)
 - g: Toggle GPU (optional, default: off)
+- m: Toggle Atomics (optional, default: off)
 - r: Toggle count parameter on pattern with countlist (default: off)
 - s: Toggle pattern size limit (optional, default: off for weak scaling, will be overridden to on for strong scaling)
 - t: Toggle throughput plot generation (optional, default: off)
@@ -106,10 +107,10 @@ Strong-Scaling experiment on the CPU with core-binding (`-c`) turned on and plot
 bash scripts/scaling.sh -a flag -p static_2d -f 001 -n ATS3 -c
 ```
 
-Throughput experiment on the GPU (`-g`) with throughput plotting (`-t`), pattern truncating using the values in sizelist (`-s`), and multiple scatters/gathers using the values in countlist (`-r`). Results will be found in `spatter.strongscaling/H100/flag/static_2d/001` and Figures will be found in `figures/spatter.strongscaling/H100/flag/static_2d/001`.
+Throughput experiment on the GPU (`-g`) with throughput plotting (`-t`) and atomics enabled (`-m`), pattern truncating using the values in sizelist (`-s`), and multiple scatters/gathers using the values in countlist (`-r`). Results will be found in `spatter.strongscaling/H100/flag/static_2d/001` and Figures will be found in `figures/spatter.strongscaling/H100/flag/static_2d/001`.
 
 ```
-bash scripts/scaling.sh -a flag -p static_2d -f 001 -n H100 -g -s -r -t
+bash scripts/scaling.sh -a flag -p static_2d -f 001 -n H100 -g -s -r -t -m
 ```
 
 The `scripts/mpirunscaling.sh` script has been provided if you need to use `mpirun` to launch jobs rather than `srun`.
