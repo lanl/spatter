@@ -119,7 +119,7 @@ The `scripts/mpirunscaling.sh` script has been provided if you need to use `mpir
 Simply update the `ranklist` variables in `scripts/config.sh` to the value of `( 1 )`
 
 ```
-bash scripts/scaling.sh -a flag -p static_2d -f 001 -n H100 -g
+bash scripts/scaling.sh -a flag -p static_2d -f 001 -n H100 -g -m
 ```
 
 

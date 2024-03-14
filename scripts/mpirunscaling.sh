@@ -28,7 +28,7 @@ else
 	PSIZE=0
 	GPU=0
 	THROUGHPUT=0
-	while getopts "a:f:p:n:cgrstwx" opt; do
+	while getopts "a:f:p:n:cgmrstwx" opt; do
 		case $opt in 
 			a) APP=$OPTARG
 			;;
