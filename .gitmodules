@@ -1,3 +1,6 @@
 [submodule "spatter"]
 	path = spatter
 	url = git@github.com:hpcgarage/spatter.git
+[submodule "datafiles"]
+	path = datafiles
+	url = git@github.com:lanl-spatter/datafiles.git
