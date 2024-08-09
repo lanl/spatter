@@ -4,7 +4,7 @@ usage() {
 	echo "Usage ./scaling.sh -a <application> -p <input problem> -f <pattern> -n <arch> [-b 'toggle boundary limit'] [-c 'toggle core binding'] [-g 'toggle gpu'] [-s 'toggle pattern size list'] [-t 'toggle throughput plots'] [-w 'toggle weak scaling'] [-x 'toggle plotting']
 		-a : Specify the name of the application (see available apps in the patterns sub-directory)
 		-p : Specify the name of the input problem (see available problems in the application sub-directory)
-		-f : Specify the base name of the input JSON file containing the gather/scatter pattern (see available patterns in the input problem subdirectory)
+		-f : Specify the base name of the input JSON file containing the gather/scatter pattern (see available patterns in the datafiles subdirectory)
 		-n : Specify the test name you would like to use to identify this run (used to appropriately save data)
 		-c : Optional, toggle core binding (default: off)
 		-g : Optional, toggle gpu (default: off/cpu)
@@ -117,7 +117,7 @@ else
 		exit 1
 	fi
 
-	JSON=${HOMEDIR}/patterns/${APP}/${PROBLEM}/${PATTERN}.json
+	JSON=${HOMEDIR}/datafiles/${APP}/${PROBLEM}/${PATTERN}.json
 
 	mkdir -p ${SCALINGDIR}/${RUNNAME}/${APP}/${PROBLEM}/${PATTERN}
 			

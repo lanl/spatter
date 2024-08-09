@@ -182,7 +182,7 @@ def main():
 
     subdirs = [x[0] for x in os.walk(base) if x[0] != base]
 
-    pfile = os.getcwd() + '/patterns/' + app + '/' + problem + '/' + func + '.json'
+    pfile = os.getcwd() + '/datafiles/' + app + '/' + problem + '/' + func + '.json'
 
     gs_types = os.popen("cat " + pfile + " | grep -o -P 'kernel.{0,20}'| grep -o 'Gather\|Scatter' ").read()
     gs_types = gs_types.split('\n')

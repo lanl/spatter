@@ -26,7 +26,8 @@ echo "Generating Base Module Files"
 
 if [[ "${CPUBUILD}" -eq "1" ]]; then
 	echo "CPU Base Module File Located in modules/cpu.mod"
-	cp modules/ats3.mod modules/cpu.mod
+	cp modules/darwin_skylake.mod modules/cpu.mod
+#	cp modules/ats3.mod modules/cpu.mod
 fi
 
 if [[ "${GPUBUILD}" -eq "1" ]]; then
@@ -35,19 +36,22 @@ if [[ "${GPUBUILD}" -eq "1" ]]; then
 fi
 
 echo "Pulling LFS files..."
+cd datafiles
 git lfs pull
+cd ..
 echo""
 
 echo "Untarring Patterns..."
-find ./patterns/flag -iname '*.tar.gz' -exec tar -xvzf {} \;
-find ./patterns/xrage -iname '*.tar.gz' -exec tar -xvzf {} \;
+find ./datafiles/flag -iname '*.tar.gz' -exec tar -xvzf {} \;
+mv 001.fp.json  001.json  001.nonfp.json datafiles/flag/static_2d/
 
+find ./datafiles/xrage -iname '*.tar.gz' -exec tar -xvzf {} \;
 python3 scripts/split.py
 
-mv spatter.json patterns/xrage/asteroid/spatter.json
+mv spatter.json datafiles/xrage/asteroid/spatter.json
 for i in {1..9}
 do
-	mv spatter${i}.json patterns/xrage/asteroid/spatter${i}.json
+	mv spatter${i}.json datafiles/xrage/asteroid/spatter${i}.json
 done
 
 echo ""

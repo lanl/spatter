@@ -40,13 +40,13 @@ bash scripts/setup.sh -c -g
 
 This setup script performs the following:
 
-1. Untars the Pattern JSON files located in the `patterns` directory
-    - `patterns/flag/static_2d/001.fp.json`
-    - `patterns/flag/static_2d/001.nonfp.json`
-    - `patterns/flag/static_2d/001.json` 
-    - `patterns/xrage/asteroid/spatter.json`
-2. Extracts patterns from `patterns/xrage/asteroid/spatter.json` to separate JSON files located at `patterns/xrage/asteroid/spatter{1-9}.json`
-3. Generates a default module file located in `modules/cpu.mod` and `moduules/gpu.mod`
+1. Untars the Pattern JSON files located in the `datafiles` directory
+    - `datafiles/flag/static_2d/001.fp.json`
+    - `datafiles/flag/static_2d/001.nonfp.json`
+    - `datafiles/flag/static_2d/001.json` 
+    - `datafiles/xrage/asteroid/spatter.json`
+2. Extracts patterns from `datafiles/xrage/asteroid/spatter.json` to separate JSON files located at `datafiles/xrage/asteroid/spatter{1-9}.json`
+3. Generates a default module file located in `modules/cpu.mod` and `modules/gpu.mod`
     - Contains generic module load statements for CPU and GPU dependencies
 4. Populates the CPU configuration file (`scripts/cpu_config.sh`) with reasonable defaults for a ATS-3 system
    - HOMEDIR is set to the directory this repository sits in
