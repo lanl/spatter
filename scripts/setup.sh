@@ -35,15 +35,16 @@ if [[ "${GPUBUILD}" -eq "1" ]]; then
 	cp modules/darwin_a100.mod modules/gpu.mod
 fi
 
-echo "Pulling LFS files..."
-cd datafiles
-git lfs pull
-cd ..
-echo""
+echo "Pulling Spatter input files..."
+wget ftp://hpc-ftp.lanl.gov//data/benchmarks/LA-UR-22-29230-spatter-bench/LA-UR-22-29230-spatter-bench.tar.gz
+tar -xzvf LA-UR-22-29230-spatter-bench.tar.gz
+rm LA-UR-22-29230-spatter-bench.tar.gz
+mv LA-UR-22-29230/spatter-patterns datafiles
+rm -rf LA-UR-22-29230 
+echo ""
 
 echo "Untarring Patterns..."
 find ./datafiles/flag -iname '*.tar.gz' -exec tar -xvzf {} \;
-mv 001.fp.json  001.json  001.nonfp.json datafiles/flag/static_2d/
 
 find ./datafiles/xrage -iname '*.tar.gz' -exec tar -xvzf {} \;
 python3 scripts/split.py
